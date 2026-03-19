@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CB7LJSTCV"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-  
-    gtag('config', 'G-5CB7LJSTCV');
-  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trading Strategy Analyzer</title>
@@ -75,8 +66,10 @@
     .tip:hover .tip-box { display: block; }
     .tip-box { display: none; position: absolute; left: 20px; top: -4px; width: 230px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.5; padding: 7px 10px; border-radius: 7px; z-index: 100; pointer-events: none; }
     .tip-box::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
-    .control-row label { display: flex; align-items: center; font-size: 13px; color: #444444; }
-    .ev-label { display: flex; align-items: center; color: #444444; }
+    .preset-btn.unstable { border-color: #c0392b; color: #c0392b; }
+    .preset-btn.unstable:hover { background: #fdf0ee; }
+    .preset-btn.unstable.active { border-color: #c0392b; color: #c0392b; background: #fdf0ee; }
+    .unstable-note { font-size: 10px; color: #c0392b; margin-top: 5px; }
   </style>
 </head>
 <body>
@@ -88,12 +81,15 @@
   <div class="section">
     <div class="section-title" data-i18n="presetsLabel"></div>
     <div class="preset-bar">
-      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')" data-i18n-btn="customLabel">Custom</button>
-      <button class="preset-btn" id="btn-btc"    onclick="loadPreset('btc')">BTC Perp</button>
-      <button class="preset-btn" id="btn-es"     onclick="loadPreset('es')">S&amp;P 500 (ES)</button>
-      <button class="preset-btn" id="btn-nq"     onclick="loadPreset('nq')">Nasdaq (NQ)</button>
+      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')">Custom</button>
+      <button class="preset-btn" id="btn-btc"  onclick="loadPreset('btc')">BTC Perp</button>
+      <button class="preset-btn" id="btn-spy"  onclick="loadPreset('spy')">S&amp;P 500 (SPY)</button>
+      <button class="preset-btn" id="btn-qqq"  onclick="loadPreset('qqq')">Nasdaq (QQQ)</button>
+      <button class="preset-btn unstable" id="btn-es" onclick="loadPreset('es')">ES Futures</button>
+      <button class="preset-btn unstable" id="btn-nq" onclick="loadPreset('nq')">NQ Futures</button>
       <div class="live-badge" id="live-badge"></div>
     </div>
+    <div class="unstable-note" data-i18n="unstableNote"></div>
     <div class="custom-price-row" id="custom-price-row">
       <label data-i18n="customPriceLabel"></label>
       <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" oninput="onCustomPrice()">
@@ -297,6 +293,7 @@ const T = {
     ofPosition: '포지션의',
     feeStr: (pct) => `포지션의 ${pct}%`,
     presetsLabel: '시장 프리셋 (실시간 데이터)',
+    unstableNote: '⚠ 빨간 테두리 버튼은 Yahoo Finance를 사용하며 불안정할 수 있습니다.',
     customLabel: '직접 입력',
     customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
@@ -397,6 +394,7 @@ const T = {
     yours: 'yours',
     ofPosition: 'of position',
     presetsLabel: 'Market presets (live data)',
+    unstableNote: '⚠ Red-outlined buttons use Yahoo Finance and may be unreliable.',
     customLabel: 'Custom',
     customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
@@ -741,7 +739,7 @@ let livePriceUnit = '$';
 let activePreset = 'custom';
 
 function setActiveBtn(key) {
-  ['custom','btc','es','nq'].forEach(k => {
+  ['custom','btc','spy','qqq','es','nq'].forEach(k => {
     document.getElementById('btn-' + k).classList.remove('active');
   });
   document.getElementById('btn-' + key).classList.add('active');
@@ -814,16 +812,28 @@ const PRESETS = {
     }
   },
   es: {
-    label: 'ES (S&P 500 Futures)',
+    label: 'ES Futures',
     feeDefault: 2,
     priceUnit: 'pts',
     async fetch() { return fetchYahoo('ES=F'); }
   },
   nq: {
-    label: 'NQ (Nasdaq Futures)',
+    label: 'NQ Futures',
     feeDefault: 2,
     priceUnit: 'pts',
     async fetch() { return fetchYahoo('NQ=F'); }
+  },
+  spy: {
+    label: 'SPY (S&P 500 ETF)',
+    feeDefault: 1,
+    priceUnit: '$',
+    async fetch() { return fetchStooq('spy'); }
+  },
+  qqq: {
+    label: 'QQQ (Nasdaq ETF)',
+    feeDefault: 1,
+    priceUnit: '$',
+    async fetch() { return fetchStooq('qqq'); }
   }
 };
 
@@ -853,6 +863,29 @@ async function fetchYahoo(ticker) {
     }
   }
   throw lastErr || new Error('Yahoo Finance unavailable for ' + ticker);
+}
+
+async function fetchStooq(ticker) {
+  // Stooq returns CSV: Date,Open,High,Low,Close,Volume
+  // Fetch ~90 days for ATR warmup
+  const url  = `https://stooq.com/q/d/l/?s=${ticker}&i=d`;
+  let text;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error(`Stooq HTTP ${res.status}`);
+    text = await res.text();
+  } catch {
+    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://stooq.com/q/d/l/?s=' + ticker + '&i=d')}`;
+    const res   = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error('Stooq via proxy failed');
+    text = await res.text();
+  }
+  const lines = text.trim().split('\n').slice(1); // skip header
+  const rows  = lines.map(l => {
+    const p = l.split(',');
+    return { high: parseFloat(p[2]), low: parseFloat(p[3]), close: parseFloat(p[4]) };
+  }).filter(r => !isNaN(r.close)).slice(-90); // last 90 candles
+  return parseOHLCV(rows, r => r);
 }
 
 async function loadPreset(key) {
