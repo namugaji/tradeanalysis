@@ -157,9 +157,11 @@
       </div>
     </div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #1D9E75;margin-top:1px;"></div><span data-i18n="allWins"></span></div>
+      <div class="legend-item"><div class="legend-line" style="border-top:1px dashed #1D9E75;margin-top:1px;"></div><span data-i18n="sigma2up"></span></div>
+      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #1D9E75;margin-top:1px;"></div><span data-i18n="sigma1up"></span></div>
       <div class="legend-item"><div class="legend-line" style="background:#185FA5;height:2px;"></div><span data-i18n="expectedMedian"></span></div>
-      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #E24B4A;margin-top:1px;"></div><span data-i18n="allLosses"></span></div>
+      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #E24B4A;margin-top:1px;"></div><span data-i18n="sigma1lo"></span></div>
+      <div class="legend-item"><div class="legend-line" style="border-top:1px dashed #E24B4A;margin-top:1px;"></div><span data-i18n="sigma2lo"></span></div>
     </div>
     <div class="chart-wrap"><canvas id="eqChart"></canvas></div>
   </div>
@@ -201,9 +203,11 @@ const T = {
     chartTitle: '자산 곡선 (로그 스케일)',
     chartWindow: '차트 기간',
     daysUnit: '일',
-    allWins: '75% 승률 (낙관)',
+    sigma2up: '+2σ (상위 95%)',
+    sigma1up: '+1σ (상위 68%)',
     expectedMedian: '예상 중앙값',
-    allLosses: '25% 승률 (비관)',
+    sigma1lo: '-1σ (하위 68%)',
+    sigma2lo: '-2σ (하위 95%)',
     yAxisLabel: '포트폴리오 가치 (로그 스케일, 시작 = 100)',
     xAxisLabel: '일',
     inARow: '연속',
@@ -253,9 +257,11 @@ const T = {
     chartTitle: 'Equity curve (log scale)',
     chartWindow: 'Chart window',
     daysUnit: 'days',
-    allWins: '75% win rate (optimistic)',
+    sigma2up: '+2σ (95th percentile)',
+    sigma1up: '+1σ (84th percentile)',
     expectedMedian: 'Expected median',
-    allLosses: '25% win rate (pessimistic)',
+    sigma1lo: '-1σ (16th percentile)',
+    sigma2lo: '-2σ (5th percentile)',
     yAxisLabel: 'Portfolio value (log scale, start = 100)',
     xAxisLabel: 'Days',
     inARow: 'in a row',
@@ -432,8 +438,9 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
   const numTrades    = Math.max(1, Math.round(chartDays * tradesPerDay));
   const cappedTrades = Math.min(numTrades, 5000);
 
-  const ptfUpper = calcPTF(0.75, netWinFrac, netLossFrac);
-  const ptfLower = calcPTF(0.25, netWinFrac, netLossFrac);
+  const a    = Math.log(1 + netWinFrac);
+  const b    = Math.log(Math.max(1 - netLossFrac, 0.000001));
+  const diff = Math.abs(a - b);
 
   const infoEl = document.getElementById('trades-in-window');
   if (tm === 0) {
@@ -445,19 +452,20 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
   }
 
   const step = Math.max(1, Math.floor(cappedTrades / 300));
-  const medianSeries = [100], upperSeries = [100], lowerSeries = [100], labels = ['0'];
-  let med = 100, hi = 100, lo = 100;
+  const medSeries = [100], s1up = [100], s1lo = [100], s2up = [100], s2lo = [100], labels = ['0'];
+  let med = 100;
 
   for (let i = 1; i <= cappedTrades; i++) {
     med *= ptf;
-    hi  *= ptfUpper;
-    lo  *= ptfLower;
     if (i % step === 0 || i === cappedTrades) {
-      const day = tradesPerDay > 0 ? i / tradesPerDay : 0;
+      const day   = tradesPerDay > 0 ? i / tradesPerDay : 0;
+      const sigma = diff * Math.sqrt(i * wr * (1 - wr));
       labels.push(day % 1 === 0 ? day.toFixed(0) : day.toFixed(1));
-      medianSeries.push(parseFloat(med.toFixed(4)));
-      upperSeries.push(parseFloat(Math.max(hi, 0.000001).toFixed(4)));
-      lowerSeries.push(parseFloat(Math.max(lo, 0.000001).toFixed(6)));
+      medSeries.push(parseFloat(med.toFixed(4)));
+      s1up.push(parseFloat((med * Math.exp(sigma)).toFixed(4)));
+      s1lo.push(parseFloat(Math.max(med * Math.exp(-sigma), 0.000001).toFixed(6)));
+      s2up.push(parseFloat((med * Math.exp(2 * sigma)).toFixed(4)));
+      s2lo.push(parseFloat(Math.max(med * Math.exp(-2 * sigma), 0.000001).toFixed(6)));
     }
   }
 
@@ -469,9 +477,11 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
     data: {
       labels,
       datasets: [
-        { label: t('allWins'),        data: upperSeries,  borderColor: '#1D9E75', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false },
-        { label: t('expectedMedian'), data: medianSeries, borderColor: '#185FA5', borderWidth: 2,   pointRadius: 0, fill: false },
-        { label: t('allLosses'),      data: lowerSeries,  borderColor: '#E24B4A', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false }
+        { label: t('sigma2up'),       data: s2up,      borderColor: '#1D9E75', borderWidth: 1,   borderDash: [2,5], pointRadius: 0, fill: false },
+        { label: t('sigma1up'),       data: s1up,      borderColor: '#1D9E75', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false },
+        { label: t('expectedMedian'), data: medSeries, borderColor: '#185FA5', borderWidth: 2,   borderDash: [],    pointRadius: 0, fill: false },
+        { label: t('sigma1lo'),       data: s1lo,      borderColor: '#E24B4A', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false },
+        { label: t('sigma2lo'),       data: s2lo,      borderColor: '#E24B4A', borderWidth: 1,   borderDash: [2,5], pointRadius: 0, fill: false }
       ]
     },
     options: {
@@ -483,12 +493,10 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
         tooltip: {
           callbacks: {
             label: function(ctx) {
-              const idx  = ctx.datasetIndex;
-              const val  = ctx.parsed.y;
-              const abs  = portfolio * val / 100;
-              const pct  = val.toFixed(1);
-              const absStr = curr + Math.round(abs).toLocaleString();
-              return ctx.dataset.label + ':  ' + pct + '  (' + absStr + ')';
+              const val    = ctx.parsed.y;
+              const absVal = portfolio * val / 100;
+              const absStr = curr + Math.round(absVal).toLocaleString();
+              return ctx.dataset.label + ':  ' + val.toFixed(1) + '  (' + absStr + ')';
             }
           }
         }
