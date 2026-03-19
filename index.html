@@ -58,7 +58,10 @@
     .preset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .live-badge { font-size: 12px; color: #555; margin-left: auto; }
     .live-badge span { font-weight: 500; color: #111; }
-    .live-error { font-size: 11px; color: #E24B4A; margin-top: 4px; display: none; }
+    .custom-price-row { display: none; align-items: center; gap: 8px; margin-top: 8px; }
+    .custom-price-row input { padding: 6px 10px; font-size: 14px; font-weight: 500; border: 1px solid #cccccc; border-radius: 8px; background: #fff; color: #111; width: 160px; }
+    .custom-price-row input:focus { outline: none; border-color: #185FA5; }
+    .custom-price-row label { font-size: 13px; color: #444; }
   </style>
 </head>
 <body>
@@ -70,10 +73,15 @@
   <div class="section">
     <div class="section-title" data-i18n="presetsLabel"></div>
     <div class="preset-bar">
-      <button class="preset-btn" id="btn-btc" onclick="loadPreset('btc')">BTC Perp</button>
-      <button class="preset-btn" id="btn-es"  onclick="loadPreset('es')">S&amp;P 500 (ES)</button>
-      <button class="preset-btn" id="btn-nq"  onclick="loadPreset('nq')">Nasdaq (NQ)</button>
+      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')" data-i18n-btn="customLabel">Custom</button>
+      <button class="preset-btn" id="btn-btc"    onclick="loadPreset('btc')">BTC Perp</button>
+      <button class="preset-btn" id="btn-es"     onclick="loadPreset('es')">S&amp;P 500 (ES)</button>
+      <button class="preset-btn" id="btn-nq"     onclick="loadPreset('nq')">Nasdaq (NQ)</button>
       <div class="live-badge" id="live-badge"></div>
+    </div>
+    <div class="custom-price-row" id="custom-price-row">
+      <label data-i18n="customPriceLabel"></label>
+      <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" oninput="onCustomPrice()">
     </div>
     <div class="live-error" id="live-error"></div>
   </div>
@@ -274,6 +282,8 @@ const T = {
     ofPosition: '포지션의',
     feeStr: (pct) => `포지션의 ${pct}%`,
     presetsLabel: '시장 프리셋 (실시간 데이터)',
+    customLabel: '직접 입력',
+    customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
     stopDollarLabel: '손절 거리 (가격 기준)',
     fetchingLabel: '데이터 로딩 중...',
@@ -350,6 +360,8 @@ const T = {
     yours: 'yours',
     ofPosition: 'of position',
     presetsLabel: 'Market presets (live data)',
+    customLabel: 'Custom',
+    customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
     stopDollarLabel: 'Stop distance (price terms)',
     fetchingLabel: 'Loading live data...',
@@ -643,13 +655,29 @@ document.getElementById('portfolio').addEventListener('input', update);
 ['wr','rr','tm','rpt','fee','slippage','chartdays','atr','stopmult'].forEach(id => {
   document.getElementById(id).addEventListener('input', update);
 });
+setActiveBtn('custom');
 update();
 
 // ── Live data / presets ──────────────────────────────────────────────────────
 
 let livePrice = null;
 let livePriceUnit = '$';
-let activePreset = null;
+let activePreset = 'custom';
+
+function setActiveBtn(key) {
+  ['custom','btc','es','nq'].forEach(k => {
+    document.getElementById('btn-' + k).classList.remove('active');
+  });
+  document.getElementById('btn-' + key).classList.add('active');
+  document.getElementById('custom-price-row').style.display = key === 'custom' ? 'flex' : 'none';
+}
+
+function onCustomPrice() {
+  const v = parseFloat(document.getElementById('custom-price').value);
+  livePrice     = (!isNaN(v) && v > 0) ? v : null;
+  livePriceUnit = '$';
+  update();
+}
 
 function parseOHLCV(rows, mapper) {
   const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
@@ -680,6 +708,10 @@ async function viaAllorigins(url) {
 }
 
 const PRESETS = {
+  custom: {
+    label: 'Custom',
+    priceUnit: '$',
+  },
   btc: {
     label: 'BTC Perp',
     feeDefault: 8,
@@ -738,18 +770,26 @@ async function fetchYahoo(ticker) {
 
 async function loadPreset(key) {
   const preset = PRESETS[key];
-  const btn    = document.getElementById('btn-' + key);
   const badge  = document.getElementById('live-badge');
   const errEl  = document.getElementById('live-error');
 
-  ['btc','es','nq'].forEach(k => {
-    document.getElementById('btn-' + k).classList.remove('active');
-    document.getElementById('btn-' + k).disabled = false;
-  });
-  btn.classList.add('active');
+  setActiveBtn(key);
+  errEl.style.display = 'none';
+  badge.innerHTML = '';
+
+  // Custom: just show the input, no fetch
+  if (key === 'custom') {
+    livePrice     = null;
+    activePreset  = 'custom';
+    const v = parseFloat(document.getElementById('custom-price').value);
+    if (!isNaN(v) && v > 0) { livePrice = v; livePriceUnit = '$'; }
+    update();
+    return;
+  }
+
+  const btn = document.getElementById('btn-' + key);
   btn.disabled = true;
   badge.innerHTML = T[currentLang].fetchingLabel;
-  errEl.style.display = 'none';
 
   try {
     const { price, atrPct } = await preset.fetch();
@@ -770,11 +810,11 @@ async function loadPreset(key) {
     console.error('Preset fetch failed:', e);
     livePrice = null;
     badge.innerHTML = '';
-    btn.classList.remove('active');
+    document.getElementById('btn-' + key).classList.remove('active');
     errEl.textContent   = T[currentLang].fetchErrorLabel + ' (' + e.message + ')';
     errEl.style.display = 'block';
   } finally {
-    btn.disabled = false;
+    document.getElementById('btn-' + key).disabled = false;
   }
 }
 
