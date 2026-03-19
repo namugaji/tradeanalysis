@@ -71,6 +71,12 @@
     .custom-price-row input { padding: 6px 10px; font-size: 14px; font-weight: 500; border: 1px solid #cccccc; border-radius: 8px; background: #fff; color: #111; width: 160px; }
     .custom-price-row input:focus { outline: none; border-color: #185FA5; }
     .custom-price-row label { font-size: 13px; color: #444; }
+    .tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: #e0e0e0; color: #555; font-size: 10px; font-weight: 700; cursor: default; margin-left: 5px; position: relative; flex-shrink: 0; vertical-align: middle; }
+    .tip:hover .tip-box { display: block; }
+    .tip-box { display: none; position: absolute; left: 20px; top: -4px; width: 230px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.5; padding: 7px 10px; border-radius: 7px; z-index: 100; pointer-events: none; }
+    .tip-box::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
+    .control-row label { display: flex; align-items: center; font-size: 13px; color: #444444; }
+    .ev-label { display: flex; align-items: center; color: #444444; }
   </style>
 </head>
 <body>
@@ -101,7 +107,7 @@
     <div class="section-title" data-i18n="portfolioLabel"></div>
     <div class="portfolio-row">
       <span class="currency-prefix" id="currency-prefix"></span>
-      <input type="number" id="portfolio" min="0" step="1000" value="50000">
+      <input type="text" id="portfolio" inputmode="numeric" placeholder="50,000" value="50,000">
     </div>
     <div class="error-msg" id="portfolio-error"></div>
   </div>
@@ -112,35 +118,35 @@
     <div class="section-title" data-i18n="strategyParams"></div>
     <div class="controls">
       <div class="control-row">
-        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">45%</span></label>
+        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">45%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_wr"></span></span></label>
         <input type="range" id="wr" min="0" max="100" step="1" value="45">
       </div>
       <div class="control-row">
-        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">2.50R</span></label>
+        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">2.50R</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rr"></span></span></label>
         <input type="range" id="rr" min="0" max="10" step="0.01" value="2.5">
       </div>
       <div class="control-row">
-        <label><span data-i18n="tradesPerMonth"></span>: <span class="val" id="tm-out">20</span></label>
+        <label><span data-i18n="tradesPerMonth"></span>: <span class="val" id="tm-out">20</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_tm"></span></span></label>
         <input type="range" id="tm" min="0" max="600" step="1" value="20">
       </div>
       <div class="control-row">
-        <label><span data-i18n="riskPerTrade"></span>: <span class="val" id="rpt-out">1.0%</span></label>
+        <label><span data-i18n="riskPerTrade"></span>: <span class="val" id="rpt-out">1.0%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rpt"></span></span></label>
         <input type="range" id="rpt" min="0" max="500" step="5" value="10">
       </div>
       <div class="control-row">
-        <label><span data-i18n="atrLabel"></span>: <span class="val" id="atr-out">3.0%</span></label>
+        <label><span data-i18n="atrLabel"></span>: <span class="val" id="atr-out">3.0%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_atr"></span></span></label>
         <input type="range" id="atr" min="1" max="200" step="1" value="30">
       </div>
       <div class="control-row">
-        <label><span data-i18n="stopMultLabel"></span>: <span class="val" id="mult-out">1.5×</span></label>
+        <label><span data-i18n="stopMultLabel"></span>: <span class="val" id="mult-out">1.5×</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_mult"></span></span></label>
         <input type="range" id="stopmult" min="5" max="50" step="1" value="15">
       </div>
       <div class="control-row">
-        <label><span data-i18n="feePerTx"></span>: <span class="val" id="fee-out">0.08%</span></label>
+        <label><span data-i18n="feePerTx"></span>: <span class="val" id="fee-out">0.08%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_fee"></span></span></label>
         <input type="range" id="fee" min="0" max="200" step="1" value="8">
       </div>
       <div class="control-row">
-        <label><span data-i18n="slippageLabel"></span>: <span class="val" id="slip-out">0.00%</span></label>
+        <label><span data-i18n="slippageLabel"></span>: <span class="val" id="slip-out">0.00%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_slip"></span></span></label>
         <input type="range" id="slippage" min="0" max="100" step="1" value="0">
       </div>
     </div>
@@ -151,10 +157,10 @@
   <div class="section">
     <div class="section-title" data-i18n="sizingTitle"></div>
     <div class="ev-row" id="row-live-price" style="display:none;"><span class="ev-label" data-i18n="livePriceLabel"></span><span id="live-price-display"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="stopDistLabel"></span><span id="stop-dist"></span></div>
-    <div class="ev-row" id="row-stop-dollar" style="display:none;"><span class="ev-label" data-i18n="stopDollarLabel"></span><span id="stop-dollar"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="posSizeLabel"></span><span id="pos-size"></span></div>
-    <div class="ev-row" style="border-bottom:none;"><span class="ev-label" data-i18n="noiseRiskLabel"></span><span id="noise-risk" style="font-weight:500;"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="stopDistLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDist"></span></span></span><span id="stop-dist"></span></div>
+    <div class="ev-row" id="row-stop-dollar" style="display:none;"><span class="ev-label"><span data-i18n="stopDollarLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDollar"></span></span></span><span id="stop-dollar"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="posSizeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_posSize"></span></span></span><span id="pos-size"></span></div>
+    <div class="ev-row" style="border-bottom:none;"><span class="ev-label"><span data-i18n="noiseRiskLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_noiseRisk"></span></span></span><span id="noise-risk" style="font-weight:500;"></span></div>
     <div style="font-size:11px;color:#888;margin-top:10px;font-style:italic;" data-i18n="atrDisclaimer"></div>
   </div>
 
@@ -162,20 +168,20 @@
 
   <div class="section">
     <div class="section-title" data-i18n="feeBreakdown"></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="totalFeeLabel"></span><span id="fee-total"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="slippageCostLabel"></span><span id="slip-cost"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="totalCostLabel"></span><span id="total-cost" style="font-weight:500;"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="feeAsR"></span><span id="fee-r"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="totalFeeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_totalFee"></span></span></span><span id="fee-total"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="slippageCostLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_slipCost"></span></span></span><span id="slip-cost"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="totalCostLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_totalCost"></span></span></span><span id="total-cost" style="font-weight:500;"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="feeAsR"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_feeR"></span></span></span><span id="fee-r"></span></div>
   </div>
 
   <hr class="divider">
 
   <div class="section">
     <div class="section-title" data-i18n="evTitle"></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="grossEV"></span><span id="ev-gross"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="netEV"></span><span id="ev-net" style="font-weight:500;"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="breakEvenWR"></span><span id="be-wr"></span></div>
-    <div class="ev-row"><span class="ev-label" data-i18n="edgeLabel"></span><span id="edge"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="grossEV"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_grossEV"></span></span></span><span id="ev-gross"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="netEV"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_netEV"></span></span></span><span id="ev-net" style="font-weight:500;"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="breakEvenWR"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_beWR"></span></span></span><span id="be-wr"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="edgeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_edge"></span></span></span><span id="edge"></span></div>
   </div>
 
   <hr class="divider">
@@ -313,6 +319,28 @@ const T = {
       return { label: '보수적 — 일반 일일 범위를 크게 벗어남', color: '#1D9E75' };
     },
     langToggleBtn: 'English',
+    tips: {
+      tip_wr:        '전략이 실현된 히스토리 또는 목표에 기반한 거래 성공 비율.',
+      tip_rr:        '이익 목표와 손절 거리의 비율. 2.5R = 손절의 2.5배 수익 목표.',
+      tip_tm:        '한 달 동안 실행할 예상 거래 수.',
+      tip_rpt:       '단일 거래에서 허용할 최대 손실액 (포트폴리오 대비 %). 리스크 허용 범위에 따라 직접 설정.',
+      tip_atr:       '14일 평균 실제 범위를 현재 가격으로 나눈 값. 일반적인 일일 변동성을 나타냄. 차팅 플랫폼에서 확인 가능.',
+      tip_mult:      'ATR의 배수로 손절을 설정해 일반적인 노이즈 위에 여유 공간 확보. 1.5× 이하는 일반 변동성에 자주 손절될 수 있음.',
+      tip_fee:       '진입 또는 청산 시 1회 거래당 수수료 (포지션 크기 대비 %). 왕복 비용은 2×.',
+      tip_slip:      '손절이 빠르게 움직이는 시장에서 지정가보다 불리한 가격에 체결될 때 발생. 포지션 크기 대비 %로 입력.',
+      tip_stopDist:  '진입가 대비 손절 위치의 거리 (ATR% × 손절 배수).',
+      tip_stopDollar:'현재 가격 기준 손절까지의 절대 금액 또는 포인트 거리.',
+      tip_posSize:   '손절 시 최대 손실이 정확히 최대 손실%가 되도록 유지하는 권장 포지션 크기. = 최대 손실% ÷ 손절 거리%.',
+      tip_noiseRisk: '손절 배수가 ATR 대비 얼마나 멀리 있는지에 따른 노이즈 손절의 정성적 위험 지표.',
+      tip_totalFee:  '수수료율 × 2 (매수 + 매도). 스케일 인/아웃 시에도 총 포지션 비중이 같으면 동일.',
+      tip_slipCost:  '슬리피지는 손실의 약 10%에서 발생한다고 가정 (유동성 높은 시장 기준). 포지션 대비 % × 10%.',
+      tip_totalCost: '수수료 + 예상 슬리피지 비용의 합계.',
+      tip_feeR:      '총 비용이 1R (손절 금액) 대비 차지하는 비율. ATR 손절 거리를 기준으로 계산.',
+      tip_grossEV:   '비용 없이 계산한 기대값. wr × R − (1−wr) × 1.',
+      tip_netEV:     '수수료와 슬리피지를 반영한 실제 기대값. 이 값이 양수여야 전략이 수익성이 있음.',
+      tip_beWR:      '순 기대값이 0이 되는 최소 승률. 현재 승률이 이 값보다 높아야 수익 전략.',
+      tip_edge:      '현재 승률과 손익분기 승률의 차이. 실제 전략에서는 백테스트보다 5~10%p 낮을 수 있음.',
+    },
   },
   en: {
     currencySymbol: '$',
@@ -392,6 +420,28 @@ const T = {
     },
     feeStr: (pct) => `${pct}% of position`,
     langToggleBtn: '한국어',
+    tips: {
+      tip_wr:        'Percentage of trades that result in a win, based on historical results or your target.',
+      tip_rr:        'Ratio of profit target to stop distance. 2.5R means your target is 2.5× your stop loss.',
+      tip_tm:        'How many trades you expect to take in a month.',
+      tip_rpt:       'The maximum loss you are willing to accept on a single trade, as a % of your portfolio. This is a personal risk tolerance setting.',
+      tip_atr:       '14-day Average True Range divided by the current price. Represents typical daily volatility. Look this up on any charting platform.',
+      tip_mult:      'Places your stop at this multiple of ATR above the typical daily range, giving the trade room to breathe. Below 1.5× risks frequent noise stop-outs.',
+      tip_fee:       'Fee charged per transaction (entry or exit) as a % of position size. Round-trip cost is 2×.',
+      tip_slip:      'When a stop is hit in a fast-moving market you get a worse fill than your stop price. Enter as % of position size.',
+      tip_stopDist:  'Distance from entry to stop loss as a % of entry price (ATR% × stop multiple).',
+      tip_stopDollar:'The absolute price distance to your stop based on the current live price.',
+      tip_posSize:   'Position size that keeps your loss exactly at max loss % if stopped out. = max loss % ÷ stop distance %.',
+      tip_noiseRisk: 'Qualitative indicator of how likely normal daily volatility is to trigger your stop before the trade plays out.',
+      tip_totalFee:  'Fee rate × 2 (entry + exit). Identical regardless of how many tranches you scale in or out with.',
+      tip_slipCost:  'Slippage is assumed to occur on ~10% of losing trades in liquid markets. Shown as raw % × 10% expected frequency.',
+      tip_totalCost: 'Combined fee and expected slippage cost per trade.',
+      tip_feeR:      'Total cost as a fraction of 1R (your stop loss amount). Uses ATR stop distance as the denominator when set.',
+      tip_grossEV:   'Expected value before costs: wr × R − (1−wr) × 1.',
+      tip_netEV:     'Expected value after fees and slippage. Must be positive for the strategy to be profitable long-term.',
+      tip_beWR:      'The minimum win rate at which net EV equals zero. Your actual win rate must exceed this.',
+      tip_edge:      'Gap between your win rate and break-even. Real-world win rates often run 5–10pp below backtest estimates.',
+    },
   }
 };
 
@@ -403,6 +453,12 @@ function applyStaticText() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (T[currentLang][key] !== undefined) el.textContent = T[currentLang][key];
+  });
+  document.querySelectorAll('[data-i18n-tip]').forEach(el => {
+    const key = el.getAttribute('data-i18n-tip');
+    if (T[currentLang].tips && T[currentLang].tips[key]) {
+      el.textContent = T[currentLang].tips[key];
+    }
   });
   document.getElementById('currency-prefix').textContent = t('currencySymbol');
   document.getElementById('portfolio-error').textContent = t('portfolioError');
@@ -416,8 +472,17 @@ function toggleLang() {
 }
 
 function getPortfolio() {
-  const v = parseFloat(document.getElementById('portfolio').value);
+  const raw = document.getElementById('portfolio').value.replace(/,/g, '');
+  const v   = parseFloat(raw);
   return (isNaN(v) || v < 0) ? null : v;
+}
+
+function formatPortfolioInput() {
+  const el  = document.getElementById('portfolio');
+  const raw = el.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
+  const num = parseFloat(raw);
+  if (!isNaN(num)) el.value = Math.floor(num).toLocaleString();
+  else if (raw === '') el.value = '';
 }
 
 function getVals() {
@@ -660,7 +725,9 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
 }
 
 applyStaticText();
-document.getElementById('portfolio').addEventListener('input', update);
+const portEl = document.getElementById('portfolio');
+portEl.addEventListener('input', update);
+portEl.addEventListener('blur', formatPortfolioInput);
 ['wr','rr','tm','rpt','fee','slippage','chartdays','atr','stopmult'].forEach(id => {
   document.getElementById(id).addEventListener('input', update);
 });
