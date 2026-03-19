@@ -650,60 +650,65 @@ update();
 let livePrice = null;
 let activePreset = null;
  
+const PROXY = 'https://corsproxy.io/?url=';
+ 
 const PRESETS = {
   btc: {
     label: 'BTC Perp',
-    feeDefault: 8,   // 0.08% taker
+    feeDefault: 8,
     async fetch() {
-      const url = 'https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=16';
-      const res  = await fetch(url);
-      if (!res.ok) throw new Error('Binance API error');
-      const data = await res.json();
-      return parseOHLCV(data, i => ({
-        high:  parseFloat(i[2]),
-        low:   parseFloat(i[3]),
-        close: parseFloat(i[4])
-      }));
+      // Try Binance spot first, fall back to CoinGecko
+      try {
+        const url = PROXY + encodeURIComponent('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=16');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Binance failed');
+        const data = await res.json();
+        return parseOHLCV(data, i => ({
+          high: parseFloat(i[2]), low: parseFloat(i[3]), close: parseFloat(i[4])
+        }));
+      } catch {
+        // CoinGecko fallback — returns [[timestamp, open, high, low, close], ...]
+        const url = PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=14');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('CoinGecko failed');
+        const data = await res.json();
+        return parseOHLCV(data, i => ({ high: i[2], low: i[3], close: i[4] }));
+      }
     }
   },
   es: {
     label: 'ES (S&P 500 Futures)',
-    feeDefault: 2,   // ~$2.50/side per contract, small % of notional
-    async fetch() {
-      return fetchYahoo('ES=F');
-    }
+    feeDefault: 2,
+    async fetch() { return fetchYahoo('ES=F'); }
   },
   nq: {
     label: 'NQ (Nasdaq Futures)',
     feeDefault: 2,
-    async fetch() {
-      return fetchYahoo('NQ=F');
-    }
+    async fetch() { return fetchYahoo('NQ=F'); }
   }
 };
  
 function parseOHLCV(rows, mapper) {
-  const candles = rows.map(mapper);
-  const price   = candles[candles.length - 1].close;
-  // True Range for each candle (need prev close)
+  const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
+  if (candles.length < 2) throw new Error('Not enough candle data');
+  const price = candles[candles.length - 1].close;
   const trs = [];
   for (let i = 1; i < candles.length; i++) {
     const { high, low } = candles[i];
     const prevClose = candles[i - 1].close;
     trs.push(Math.max(high - low, Math.abs(high - prevClose), Math.abs(prevClose - low)));
   }
-  // 14-period ATR from the last 14 TRs
-  const atr14 = trs.slice(-14).reduce((a, b) => a + b, 0) / 14;
+  const atr14  = trs.slice(-14).reduce((a, b) => a + b, 0) / Math.min(trs.length, 14);
   const atrPct = (atr14 / price) * 100;
   return { price, atrPct };
 }
  
 async function fetchYahoo(ticker) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`;
+  const url = PROXY + encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`);
   const res  = await fetch(url);
   if (!res.ok) throw new Error('Yahoo Finance error');
   const json = await res.json();
-  const q    = json.chart.result[0];
+  const q      = json.chart.result[0];
   const highs  = q.indicators.quote[0].high;
   const lows   = q.indicators.quote[0].low;
   const closes = q.indicators.quote[0].close;
@@ -718,7 +723,6 @@ async function loadPreset(key) {
   const badge  = document.getElementById('live-badge');
   const errEl  = document.getElementById('live-error');
  
-  // Reset active state
   ['btc','es','nq'].forEach(k => {
     document.getElementById('btn-' + k).classList.remove('active');
     document.getElementById('btn-' + k).disabled = false;
@@ -730,18 +734,15 @@ async function loadPreset(key) {
  
   try {
     const { price, atrPct } = await preset.fetch();
-    livePrice   = price;
+    livePrice    = price;
     activePreset = key;
  
-    // Snap ATR slider to nearest integer step (slider is in tenths)
     const atrInt = Math.round(atrPct * 10);
     const atrEl  = document.getElementById('atr');
     atrEl.value  = Math.min(Math.max(atrInt, parseInt(atrEl.min)), parseInt(atrEl.max));
- 
-    // Set fee default
     document.getElementById('fee').value = preset.feeDefault;
  
-    const curr = t('currencySymbol');
+    const curr     = t('currencySymbol');
     const priceStr = curr + Math.round(price).toLocaleString();
     badge.innerHTML = T[currentLang].liveDataNote(preset.label, priceStr);
  
@@ -750,14 +751,14 @@ async function loadPreset(key) {
     livePrice = null;
     badge.innerHTML = '';
     btn.classList.remove('active');
-    errEl.textContent    = T[currentLang].fetchErrorLabel;
-    errEl.style.display  = 'block';
+    errEl.textContent   = T[currentLang].fetchErrorLabel;
+    errEl.style.display = 'block';
   } finally {
     btn.disabled = false;
   }
 }
  
-// Override update's sizing display to add dollar stop when price is known
+// Wrap update to inject dollar-denominated stop rows when price is known
 const _origUpdate = update;
 update = function() {
   _origUpdate();
