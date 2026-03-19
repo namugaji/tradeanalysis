@@ -229,9 +229,81 @@
   </div>
 
   <div id="verdict-box" class="alert-box" style="margin-top:1rem;"></div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title" data-i18n="mcTitle"></div>
+    <div class="controls" style="margin-bottom:1rem;">
+      <div class="control-row">
+        <label><span data-i18n="mcMonths"></span>: <span class="val" id="mc-months-out">6</span></label>
+        <input type="range" id="mc-months" min="1" max="36" step="1" value="6">
+      </div>
+      <div class="control-row">
+        <label><span data-i18n="mcRuin"></span>: <span class="val" id="mc-ruin-out">20%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_mcRuin"></span></span></label>
+        <input type="range" id="mc-ruin" min="5" max="80" step="5" value="20">
+      </div>
+    </div>
+    <button id="mc-run-btn" onclick="runMonteCarlo()" style="padding:7px 20px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;margin-bottom:1rem;" data-i18n="mcRunBtn"></button>
+    <div id="mc-results" style="display:none;">
+      <div class="metric-grid" style="margin-bottom:1rem;">
+        <div class="metric-card">
+          <div class="metric-label" data-i18n="mcMedianReturn"></div>
+          <div class="metric-value" id="mc-median"></div>
+          <div class="metric-sub" id="mc-median-usd"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label" data-i18n="mcRuinProb"></div>
+          <div class="metric-value negative" id="mc-ruin-prob"></div>
+          <div class="metric-sub" data-i18n="mcRuinSub" id="mc-ruin-sub"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label" data-i18n="mcWorstCase"></div>
+          <div class="metric-value negative" id="mc-p5"></div>
+          <div class="metric-sub" data-i18n="mcP5sub"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <div style="font-size:12px;color:#555;margin-bottom:4px;" data-i18n="mcFanLabel"></div>
+          <div style="position:relative;height:220px;"><canvas id="mc-fan-chart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#555;margin-bottom:4px;" data-i18n="mcHistLabel"></div>
+          <div style="position:relative;height:220px;"><canvas id="mc-hist-chart"></canvas></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:10px;" data-i18n="mcNote"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title" data-i18n="saTitle"></div>
+    <p style="font-size:13px;color:#555;margin:0 0 1rem;" data-i18n="saDesc"></p>
+    <div class="controls" style="margin-bottom:1rem;">
+      <div class="control-row">
+        <label data-i18n="saParamLabel"></label>
+        <select id="sa-param" style="padding:6px 10px;font-size:13px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;margin-top:4px;">
+          <option value="wr"   data-i18n-opt="saParamWR"></option>
+          <option value="rr"   data-i18n-opt="saParamRR"></option>
+          <option value="rpt"  data-i18n-opt="saParamRPT"></option>
+          <option value="mult" data-i18n-opt="saParamMult"></option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label><span data-i18n="saMonths"></span>: <span class="val" id="sa-months-out">6</span></label>
+        <input type="range" id="sa-months" min="1" max="36" step="1" value="6">
+      </div>
+    </div>
+    <button onclick="runSensitivity()" style="padding:7px 20px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;margin-bottom:1rem;" data-i18n="saRunBtn"></button>
+    <div id="sa-results" style="display:none;">
+      <div style="font-size:12px;color:#555;margin-bottom:4px;" id="sa-chart-label"></div>
+      <div style="position:relative;height:260px;"><canvas id="sa-chart"></canvas></div>
+      <div style="font-size:11px;color:#888;margin-top:8px;" data-i18n="saNote"></div>
+    </div>
+  </div>
 <script>
 let eqChart = null;
 let currentLang = 'ko';
@@ -316,6 +388,28 @@ const T = {
       return { label: '보수적 — 일반 일일 범위를 크게 벗어남', color: '#1D9E75' };
     },
     langToggleBtn: 'English',
+    mcTitle: '몬테카를로 시뮬레이션',
+    mcMonths: '시뮬레이션 기간 (개월)',
+    mcRuin: '파산 기준 최대 손실',
+    mcRunBtn: '시뮬레이션 실행 (1,000회)',
+    mcMedianReturn: '중앙값 수익률',
+    mcRuinProb: '파산 확률',
+    mcRuinSub: '기준 손실 도달 경로 비율',
+    mcWorstCase: '하위 5% 결과',
+    mcP5sub: '95% 확률로 이보다 좋음',
+    mcFanLabel: '경로 샘플 (50개) + 백분위수',
+    mcHistLabel: '최종 포트폴리오 분포',
+    mcNote: '1,000회 무작위 시뮬레이션. 각 거래는 독립적인 베르누이 시행. 실제 거래는 상관관계, 체계적 편향, 체제 변화가 있을 수 있음.',
+    saTitle: '민감도 분석',
+    saDesc: '하나의 파라미터를 전체 범위에 걸쳐 변화시키면서 수익률 중앙값, 파산 확률, 하위 5% 결과가 어떻게 바뀌는지 확인합니다. 실제 거래 기록과 비교하여 파라미터를 보정하는 데 활용하세요.',
+    saParamLabel: '분석할 파라미터',
+    saParamWR: '승률',
+    saParamRR: '손익비 (R)',
+    saParamRPT: '거래당 최대 손실 %',
+    saParamMult: '손절 배수 (ATR×)',
+    saMonths: '기간 (개월)',
+    saRunBtn: '민감도 분석 실행',
+    saNote: '각 포인트마다 200회 시뮬레이션. 방향성 파악용이며 정밀 최적화 도구가 아닙니다.',
     tips: {
       tip_wr:        '전략이 실현된 히스토리 또는 목표에 기반한 거래 성공 비율.',
       tip_rr:        '이익 목표와 손절 거리의 비율. 2.5R = 손절의 2.5배 수익 목표.',
@@ -337,6 +431,7 @@ const T = {
       tip_netEV:     '수수료와 슬리피지를 반영한 실제 기대값. 이 값이 양수여야 전략이 수익성이 있음.',
       tip_beWR:      '순 기대값이 0이 되는 최소 승률. 현재 승률이 이 값보다 높아야 수익 전략.',
       tip_edge:      '현재 승률과 손익분기 승률의 차이. 실제 전략에서는 백테스트보다 5~10%p 낮을 수 있음.',
+      tip_mcRuin:    '포트폴리오가 이 손실률에 도달하면 파산으로 간주. 개인 리스크 허용 범위에 따라 설정.',
     },
   },
   en: {
@@ -418,6 +513,28 @@ const T = {
     },
     feeStr: (pct) => `${pct}% of position`,
     langToggleBtn: '한국어',
+    mcTitle: 'Monte Carlo simulation',
+    mcMonths: 'Simulation horizon (months)',
+    mcRuin: 'Ruin threshold (max drawdown)',
+    mcRunBtn: 'Run simulation (1,000 paths)',
+    mcMedianReturn: 'Median return',
+    mcRuinProb: 'Ruin probability',
+    mcRuinSub: 'paths hitting drawdown threshold',
+    mcWorstCase: '5th percentile outcome',
+    mcP5sub: '95% of paths end above this',
+    mcFanLabel: 'Sampled paths (50) + percentile bands',
+    mcHistLabel: 'Final portfolio value distribution',
+    mcNote: '1,000 random simulations. Each trade is an independent Bernoulli trial. Real trading may have correlated losses, systematic biases, and regime changes not captured here.',
+    saTitle: 'Sensitivity analysis',
+    saDesc: 'Sweeps one parameter across its full range and shows how median return, ruin probability, and the 5th percentile outcome change. Use this to calibrate parameters against your live trading record.',
+    saParamLabel: 'Parameter to analyze',
+    saParamWR: 'Win rate',
+    saParamRR: 'Reward:Risk ratio (R)',
+    saParamRPT: 'Max loss per trade %',
+    saParamMult: 'Stop multiple (ATR×)',
+    saMonths: 'Horizon (months)',
+    saRunBtn: 'Run sensitivity analysis',
+    saNote: '200 simulations per point — sufficient for directional insight, not precise optimization.',
     tips: {
       tip_wr:        'Percentage of trades that result in a win, based on historical results or your target.',
       tip_rr:        'Ratio of profit target to stop distance. 2.5R means your target is 2.5× your stop loss.',
@@ -439,6 +556,7 @@ const T = {
       tip_netEV:     'Expected value after fees and slippage. Must be positive for the strategy to be profitable long-term.',
       tip_beWR:      'The minimum win rate at which net EV equals zero. Your actual win rate must exceed this.',
       tip_edge:      'Gap between your win rate and break-even. Real-world win rates often run 5–10pp below backtest estimates.',
+      tip_mcRuin:    'A simulation path is counted as "ruin" if the portfolio drawdown ever hits this threshold. Set based on your personal pain tolerance.',
     },
   }
 };
@@ -457,6 +575,10 @@ function applyStaticText() {
     if (T[currentLang].tips && T[currentLang].tips[key]) {
       el.textContent = T[currentLang].tips[key];
     }
+  });
+  document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+    const key = el.getAttribute('data-i18n-opt');
+    if (T[currentLang][key]) el.textContent = T[currentLang][key];
   });
   document.getElementById('currency-prefix').textContent = t('currencySymbol');
   document.getElementById('portfolio-error').textContent = t('portfolioError');
@@ -827,13 +949,13 @@ const PRESETS = {
     label: 'SPY (S&P 500 ETF)',
     feeDefault: 1,
     priceUnit: '$',
-    async fetch() { return fetchStooq('spy'); }
+    async fetch() { return fetchETF('spy'); }
   },
   qqq: {
     label: 'QQQ (Nasdaq ETF)',
     feeDefault: 1,
     priceUnit: '$',
-    async fetch() { return fetchStooq('qqq'); }
+    async fetch() { return fetchETF('qqq'); }
   }
 };
 
@@ -865,7 +987,7 @@ async function fetchYahoo(ticker) {
   throw lastErr || new Error('Yahoo Finance unavailable for ' + ticker);
 }
 
-async function fetchStooq(ticker) {
+async function fetchETF(ticker) {
   // ETFs (SPY, QQQ) are reliable on Yahoo Finance — use it directly
   const yahooTicker = ticker.toUpperCase();
   const urls = [
@@ -966,6 +1088,275 @@ update = function() {
   }
 };
 update();
-</script>
+
+// ── Monte Carlo simulation ───────────────────────────────────────────────────
+
+let mcFanChart  = null;
+let mcHistChart = null;
+
+document.getElementById('mc-months').addEventListener('input', () => {
+  document.getElementById('mc-months-out').textContent = document.getElementById('mc-months').value;
+});
+document.getElementById('mc-ruin').addEventListener('input', () => {
+  document.getElementById('mc-ruin-out').textContent = document.getElementById('mc-ruin').value + '%';
+});
+
+function runMonteCarlo() {
+  const { wr, rr, tm, rpt, fee, slip, portfolio } = getVals();
+  const months     = parseInt(document.getElementById('mc-months').value);
+  const ruinThresh = parseInt(document.getElementById('mc-ruin').value) / 100;
+
+  const atrPct     = parseInt(document.getElementById('atr').value) / 10;
+  const stopMult   = parseInt(document.getElementById('stopmult').value) / 10;
+  const stopDist   = atrPct * stopMult;
+  const rDenom     = stopDist > 0 ? stopDist : rpt;
+  const totalFee   = fee * 2;
+  const feeAsR     = rDenom > 0 ? totalFee / rDenom : 0;
+  const slipAsR    = rDenom > 0 ? (slip * 0.10) / rDenom : 0;
+  const totalCostR = feeAsR + slipAsR;
+  const R          = rpt;
+  const netWinFrac  = (rr - feeAsR) * R / 100;
+  const netLossFrac = (1 + totalCostR) * R / 100;
+
+  const N_PATHS = 1000;
+  const N_FAN   = 50;
+  let ruinCount = 0;
+
+  // Run all paths, collect finals and monthly snapshots
+  const allPaths = [];
+  const allFinals = [];
+
+  for (let p = 0; p < N_PATHS; p++) {
+    let equity = 100, peak = 100;
+    const snap = [100];
+    for (let m = 0; m < months; m++) {
+      for (let tr = 0; tr < tm; tr++) {
+        if (Math.random() < wr) equity *= (1 + netWinFrac);
+        else                    equity  = Math.max(equity * (1 - netLossFrac), 0.001);
+        if (equity > peak) peak = equity;
+      }
+      snap.push(equity);
+    }
+    if ((peak - equity) / peak >= ruinThresh) ruinCount++;
+    allPaths.push(snap);
+    allFinals.push(equity);
+  }
+
+  const sorted = [...allFinals].sort((a, b) => a - b);
+  const pct = q => sorted[Math.floor(q * N_PATHS)];
+  const p5  = pct(0.05), p50 = pct(0.50);
+
+  const ruinProb    = ruinCount / N_PATHS;
+  const medianReturn = (p50 / 100 - 1) * 100;
+  const p5Return     = (p5  / 100 - 1) * 100;
+  const curr = t('currencySymbol');
+
+  const mrEl = document.getElementById('mc-median');
+  mrEl.textContent = (medianReturn >= 0 ? '+' : '') + medianReturn.toFixed(1) + '%';
+  mrEl.className   = 'metric-value ' + (medianReturn >= 0 ? 'positive' : 'negative');
+  document.getElementById('mc-median-usd').textContent =
+    (medianReturn >= 0 ? '+' : '') + curr + Math.round(portfolio * Math.abs(medianReturn) / 100).toLocaleString();
+
+  document.getElementById('mc-ruin-prob').textContent = (ruinProb * 100).toFixed(1) + '%';
+  document.getElementById('mc-ruin-sub').textContent  =
+    ruinCount + ' / 1,000 ' + T[currentLang].mcRuinSub;
+
+  const p5El = document.getElementById('mc-p5');
+  p5El.textContent = (p5Return >= 0 ? '+' : '') + p5Return.toFixed(1) + '%';
+  p5El.className   = 'metric-value ' + (p5Return >= 0 ? 'positive' : 'negative');
+
+  document.getElementById('mc-results').style.display = 'block';
+
+  // ── Percentile bands across all paths ──
+  const labels = Array.from({ length: months + 1 }, (_, i) => i);
+  const bandAt = (step, q) => {
+    const vals = allPaths.map(path => path[step]).sort((a, b) => a - b);
+    return vals[Math.floor(q * N_PATHS)];
+  };
+  const b_p5  = labels.map(i => bandAt(i, 0.05));
+  const b_p25 = labels.map(i => bandAt(i, 0.25));
+  const b_p50 = labels.map(i => bandAt(i, 0.50));
+  const b_p75 = labels.map(i => bandAt(i, 0.75));
+  const b_p95 = labels.map(i => bandAt(i, 0.95));
+
+  // ── Fan chart ──
+  const fanDatasets = allPaths.slice(0, N_FAN).map(path => ({
+    data: path, borderColor: 'rgba(24,95,165,0.07)', borderWidth: 1,
+    pointRadius: 0, fill: false
+  }));
+  fanDatasets.push(
+    { label: 'p95', data: b_p95, borderColor: '#1D9E75', borderWidth: 1.5, borderDash: [3,3], pointRadius: 0, fill: false },
+    { label: 'p75', data: b_p75, borderColor: '#1D9E75', borderWidth: 1,   borderDash: [2,4], pointRadius: 0, fill: false },
+    { label: 'p50', data: b_p50, borderColor: '#185FA5', borderWidth: 2,   borderDash: [],    pointRadius: 0, fill: false },
+    { label: 'p25', data: b_p25, borderColor: '#E24B4A', borderWidth: 1,   borderDash: [2,4], pointRadius: 0, fill: false },
+    { label: 'p5',  data: b_p5,  borderColor: '#E24B4A', borderWidth: 1.5, borderDash: [3,3], pointRadius: 0, fill: false }
+  );
+
+  if (mcFanChart) mcFanChart.destroy();
+  mcFanChart = new Chart(document.getElementById('mc-fan-chart'), {
+    type: 'line',
+    data: { labels, datasets: fanDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: currentLang === 'ko' ? '개월' : 'Months', font: { size: 11 }, color: '#888' } },
+        y: { title: { display: true, text: currentLang === 'ko' ? '포트폴리오 (시작=100)' : 'Portfolio (start=100)', font: { size: 11 }, color: '#888' },
+             ticks: { callback: v => v.toFixed(0) } }
+      }
+    }
+  });
+
+  // ── Histogram ──
+  const minV = Math.floor(Math.min(...allFinals) / 5) * 5;
+  const maxV = Math.ceil( Math.max(...allFinals) / 5) * 5;
+  const binW = Math.max(5, Math.round((maxV - minV) / 30));
+  const bins = [];
+  for (let v = minV; v < maxV; v += binW) bins.push(v);
+  const counts = new Array(bins.length).fill(0);
+  allFinals.forEach(f => {
+    const idx = Math.min(Math.floor((f - minV) / binW), bins.length - 1);
+    counts[idx]++;
+  });
+
+  if (mcHistChart) mcHistChart.destroy();
+  mcHistChart = new Chart(document.getElementById('mc-hist-chart'), {
+    type: 'bar',
+    data: {
+      labels: bins.map(b => b.toFixed(0)),
+      datasets: [{ data: counts,
+        backgroundColor: bins.map(b => b + binW / 2 >= 100 ? 'rgba(29,158,117,0.6)' : 'rgba(226,75,74,0.6)'),
+        borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: currentLang === 'ko' ? '최종 포트폴리오 (시작=100)' : 'Final portfolio (start=100)', font: { size: 11 }, color: '#888' },
+             ticks: { maxTicksLimit: 8, autoSkip: true } },
+        y: { title: { display: true, text: currentLang === 'ko' ? '경로 수' : 'Paths', font: { size: 11 }, color: '#888' } }
+      }
+    }
+  });
+}
+
+// ── Sensitivity analysis ─────────────────────────────────────────────────────
+
+let saChart = null;
+
+document.getElementById('sa-months').addEventListener('input', () => {
+  document.getElementById('sa-months-out').textContent = document.getElementById('sa-months').value;
+});
+
+function mcStats(wr, rr, rpt, stopDistOverride, fee, slip, tm, months, ruinThresh, nPaths) {
+  const rDenom      = stopDistOverride > 0 ? stopDistOverride : rpt;
+  const feeAsR      = rDenom > 0 ? (fee * 2) / rDenom : 0;
+  const slipAsR     = rDenom > 0 ? (slip * 0.10) / rDenom : 0;
+  const R           = rpt;
+  const netWinFrac  = Math.max((rr - feeAsR) * R / 100, 0);
+  const netLossFrac = Math.min((1 + feeAsR + slipAsR) * R / 100, 0.9999);
+  const finals = [];
+  let ruinCount = 0;
+  for (let p = 0; p < nPaths; p++) {
+    let equity = 100, peak = 100;
+    for (let m = 0; m < months; m++) {
+      for (let tr = 0; tr < tm; tr++) {
+        if (Math.random() < wr) equity *= (1 + netWinFrac);
+        else                    equity  = Math.max(equity * (1 - netLossFrac), 0.001);
+        if (equity > peak) peak = equity;
+      }
+    }
+    if ((peak - equity) / peak >= ruinThresh) ruinCount++;
+    finals.push(equity);
+  }
+  finals.sort((a, b) => a - b);
+  return {
+    medianReturn: (finals[Math.floor(0.50 * nPaths)] / 100 - 1) * 100,
+    ruinProb:     (ruinCount / nPaths) * 100,
+    p5Return:     (finals[Math.floor(0.05 * nPaths)] / 100 - 1) * 100,
+  };
+}
+
+function runSensitivity() {
+  const base    = getVals();
+  const months  = parseInt(document.getElementById('sa-months').value);
+  const ruin    = parseInt(document.getElementById('mc-ruin').value) / 100;
+  const param   = document.getElementById('sa-param').value;
+  const atrPct  = parseInt(document.getElementById('atr').value) / 10;
+  const curMult = parseInt(document.getElementById('stopmult').value) / 10;
+  const stopDist = atrPct * curMult;
+
+  const sweeps = {
+    wr:   { min: 0.20, max: 0.70, fmt: v => (v*100).toFixed(0)+'%',  label: currentLang==='ko'?'승률':'Win rate (%)',       current: base.wr },
+    rr:   { min: 0.5,  max: 5.0,  fmt: v => v.toFixed(1)+'R',        label: currentLang==='ko'?'손익비 (R)':'R:R ratio',    current: base.rr },
+    rpt:  { min: 0.25, max: 5.0,  fmt: v => v.toFixed(2)+'%',        label: currentLang==='ko'?'최대 손실 %':'Max loss %',  current: base.rpt },
+    mult: { min: 0.5,  max: 4.0,  fmt: v => v.toFixed(1)+'×',        label: currentLang==='ko'?'손절 배수':'Stop multiple', current: curMult },
+  };
+  const sw     = sweeps[param];
+  const N      = 20;
+  const xVals  = Array.from({ length: N }, (_, i) => sw.min + (sw.max - sw.min) * i / (N - 1));
+  const medians = [], ruinProbs = [], p5s = [];
+
+  for (const x of xVals) {
+    let wr_ = base.wr, rr_ = base.rr, rpt_ = base.rpt, sd_ = stopDist;
+    if (param === 'wr')   wr_  = x;
+    if (param === 'rr')   rr_  = x;
+    if (param === 'rpt')  rpt_ = x;
+    if (param === 'mult') sd_  = atrPct * x;
+    const s = mcStats(wr_, rr_, rpt_, sd_, base.fee, base.slip, base.tm, months, ruin, 200);
+    medians.push(parseFloat(s.medianReturn.toFixed(2)));
+    ruinProbs.push(parseFloat(s.ruinProb.toFixed(2)));
+    p5s.push(parseFloat(s.p5Return.toFixed(2)));
+  }
+
+  const xLabels    = xVals.map(sw.fmt);
+  const curIdx     = xVals.reduce((best, v, i) =>
+    Math.abs(v - sw.current) < Math.abs(xVals[best] - sw.current) ? i : best, 0);
+  const curMarker  = medians.map((v, i) => i === curIdx ? v : null);
+
+  document.getElementById('sa-chart-label').textContent =
+    (currentLang === 'ko' ? '현재 값: ' : 'Current value: ') + sw.fmt(sw.current);
+  document.getElementById('sa-results').style.display = 'block';
+
+  if (saChart) saChart.destroy();
+  saChart = new Chart(document.getElementById('sa-chart'), {
+    type: 'line',
+    data: {
+      labels: xLabels,
+      datasets: [
+        { label: currentLang==='ko'?'수익률 중앙값 %':'Median return %',
+          data: medians, borderColor: '#185FA5', borderWidth: 2, pointRadius: 2, fill: false, yAxisID: 'y' },
+        { label: currentLang==='ko'?'파산 확률 %':'Ruin prob %',
+          data: ruinProbs, borderColor: '#E24B4A', borderWidth: 2, pointRadius: 2, fill: false, yAxisID: 'y2' },
+        { label: currentLang==='ko'?'하위 5% 수익률':'p5 return %',
+          data: p5s, borderColor: '#BA7517', borderWidth: 1.5, borderDash: [4,4], pointRadius: 2, fill: false, yAxisID: 'y' },
+        { label: currentLang==='ko'?'현재 값':'Current value',
+          data: curMarker, borderWidth: 0,
+          pointRadius: medians.map((_, i) => i === curIdx ? 8 : 0),
+          pointBackgroundColor: '#333', pointBorderColor: '#333', fill: false, yAxisID: 'y' },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 200 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, labels: { font: { size: 11 }, boxWidth: 14, padding: 10,
+          filter: item => item.datasetIndex < 3 } },
+        tooltip: { callbacks: {
+          label: ctx => ctx.datasetIndex === 3 ? null : ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
+        }}
+      },
+      scales: {
+        x:  { title: { display: true, text: sw.label, font: { size: 11 }, color: '#888' },
+              ticks: { maxTicksLimit: 10, autoSkip: true } },
+        y:  { position: 'left',
+              title: { display: true, text: currentLang==='ko'?'수익률 %':'Return %', font: { size: 11 }, color: '#888' } },
+        y2: { position: 'right',
+              title: { display: true, text: currentLang==='ko'?'파산 확률 %':'Ruin prob %', font: { size: 11 }, color: '#888' },
+              grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+}</script>
 </body>
 </html>
