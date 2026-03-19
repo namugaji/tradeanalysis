@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CB7LJSTCV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-5CB7LJSTCV');
+  </script>
+  <!-- End Google tag -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trading Strategy Analyzer</title>
@@ -66,44 +76,25 @@
     .tip:hover .tip-box { display: block; }
     .tip-box { display: none; position: absolute; left: 20px; top: -4px; width: 230px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.5; padding: 7px 10px; border-radius: 7px; z-index: 100; pointer-events: none; }
     .tip-box::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
-    .preset-btn.unstable { border-color: #c0392b; color: #c0392b; }
-    .preset-btn.unstable:hover { background: #fdf0ee; }
-    .preset-btn.unstable.active { border-color: #c0392b; color: #c0392b; background: #fdf0ee; }
+    .tip.sec { width: 15px; height: 15px; font-size: 10px; font-weight: 500; margin-left: 7px; text-transform: none; }
+    .tip.sec:hover .tip-box-lg { display: block; }
+    .tip-box-lg { display: none; position: absolute; left: 20px; top: -4px; width: 300px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.6; padding: 9px 12px; border-radius: 7px; z-index: 100; pointer-events: none; text-transform: none; letter-spacing: normal; }
+    .tip-box-lg::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
     .unstable-note { font-size: 10px; color: #c0392b; margin-bottom: 6px; }
   </style>
 </head>
 <body>
 <div class="analyzer">
-  <div style="display:flex; justify-content:flex-end; margin-bottom:1rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h1 id="main-title" style="font-size:20px; font-weight:600; color:#111; margin:0;">매매 전략 분석기</h1>
     <button class="lang-btn" id="lang-btn" onclick="toggleLang()">English</button>
   </div>
 
   <div class="section">
-    <div class="section-title" data-i18n="presetsLabel"></div>
-    <div class="unstable-note" data-i18n="unstableNote"></div>
-    <div class="preset-bar">
-      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')">Custom</button>
-      <button class="preset-btn" id="btn-btc"  onclick="loadPreset('btc')">BTC Perp</button>
-      <button class="preset-btn" id="btn-spy"  onclick="loadPreset('spy')">S&amp;P 500 (SPY)</button>
-      <button class="preset-btn" id="btn-qqq"  onclick="loadPreset('qqq')">Nasdaq (QQQ)</button>
-      <button class="preset-btn unstable" id="btn-es" onclick="loadPreset('es')">ES Futures</button>
-      <button class="preset-btn unstable" id="btn-nq" onclick="loadPreset('nq')">NQ Futures</button>
-      <div class="live-badge" id="live-badge"></div>
-    </div>
-    <div class="custom-price-row" id="custom-price-row">
-      <label data-i18n="customPriceLabel"></label>
-      <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" oninput="onCustomPrice()">
-    </div>
-    <div class="live-error" id="live-error"></div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="section">
-    <div class="section-title" data-i18n="portfolioLabel"></div>
+    <div class="section-title"><span data-i18n="portfolioLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_portfolio"></span></span></div>
     <div class="portfolio-row">
       <span class="currency-prefix" id="currency-prefix"></span>
-      <input type="text" id="portfolio" inputmode="numeric" placeholder="50,000" value="50,000">
+      <input type="text" id="portfolio" inputmode="numeric" placeholder="1,000,000" value="1,000,000">
     </div>
     <div class="error-msg" id="portfolio-error"></div>
   </div>
@@ -111,15 +102,36 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="strategyParams"></div>
+    <div class="section-title"><span data-i18n="presetsLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_presets"></span></span></div>
+    <div class="unstable-note" data-i18n="unstableNote"></div>
+    <div class="preset-bar">
+      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')">Custom</button>
+      <button class="preset-btn" id="btn-btc"  onclick="loadPreset('btc')">BTC Perp</button>
+      <button class="preset-btn" id="btn-spy"  onclick="loadPreset('spy')">S&amp;P 500 (SPY)</button>
+      <button class="preset-btn" id="btn-qqq"  onclick="loadPreset('qqq')">Nasdaq (QQQ)</button>
+      <button class="preset-btn" id="btn-es" onclick="loadPreset('es')">ES Futures</button>
+      <button class="preset-btn" id="btn-nq" onclick="loadPreset('nq')">NQ Futures</button>
+      <div class="live-badge" id="live-badge"></div>
+    </div>
+    <div class="custom-price-row" id="custom-price-row">
+      <label data-i18n="customPriceLabel"></label>
+      <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" value="1000" oninput="onCustomPrice()">
+    </div>
+    <div class="live-error" id="live-error"></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title"><span data-i18n="strategyParams"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_params"></span></span></div>
     <div class="controls">
       <div class="control-row">
-        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">45%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_wr"></span></span></label>
-        <input type="range" id="wr" min="0" max="100" step="1" value="45">
+        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">40%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_wr"></span></span></label>
+        <input type="range" id="wr" min="0" max="100" step="1" value="40">
       </div>
       <div class="control-row">
-        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">2.50R</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rr"></span></span></label>
-        <input type="range" id="rr" min="0" max="10" step="0.01" value="2.5">
+        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">2.00R</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rr"></span></span></label>
+        <input type="range" id="rr" min="0" max="10" step="0.01" value="2.0">
       </div>
       <div class="control-row">
         <label><span data-i18n="tradesPerMonth"></span>: <span class="val" id="tm-out">20</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_tm"></span></span></label>
@@ -151,19 +163,22 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="sizingTitle"></div>
+    <div class="section-title"><span data-i18n="sizingTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_sizing"></span></span></div>
     <div class="ev-row" id="row-live-price" style="display:none;"><span class="ev-label" data-i18n="livePriceLabel"></span><span id="live-price-display"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="stopDistLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDist"></span></span></span><span id="stop-dist"></span></div>
     <div class="ev-row" id="row-stop-dollar" style="display:none;"><span class="ev-label"><span data-i18n="stopDollarLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDollar"></span></span></span><span id="stop-dollar"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="posSizeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_posSize"></span></span></span><span id="pos-size"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="kellyOptLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_kellyOpt"></span></span></span><span id="kelly-opt"></span></div>
+    <div class="ev-row"><span class="ev-label"><span data-i18n="kellyFracLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_kellyFrac"></span></span></span><span id="kelly-frac" style="font-weight:500;"></span></div>
     <div class="ev-row" style="border-bottom:none;"><span class="ev-label"><span data-i18n="noiseRiskLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_noiseRisk"></span></span></span><span id="noise-risk" style="font-weight:500;"></span></div>
+    <div class="ev-row" id="row-atr-pctile" style="display:none;border-bottom:none;"><span class="ev-label"><span data-i18n="atrPctileLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_atrPctile"></span></span></span><span id="atr-pctile" style="font-weight:500;"></span></div>
     <div style="font-size:11px;color:#888;margin-top:10px;font-style:italic;" data-i18n="atrDisclaimer"></div>
   </div>
 
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="feeBreakdown"></div>
+    <div class="section-title"><span data-i18n="feeBreakdown"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_fees"></span></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="totalFeeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_totalFee"></span></span></span><span id="fee-total"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="slippageCostLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_slipCost"></span></span></span><span id="slip-cost"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="totalCostLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_totalCost"></span></span></span><span id="total-cost" style="font-weight:500;"></span></div>
@@ -173,17 +188,17 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="evTitle"></div>
+    <div class="section-title"><span data-i18n="evTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_ev"></span></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="grossEV"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_grossEV"></span></span></span><span id="ev-gross"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="netEV"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_netEV"></span></span></span><span id="ev-net" style="font-weight:500;"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="breakEvenWR"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_beWR"></span></span></span><span id="be-wr"></span></div>
-    <div class="ev-row"><span class="ev-label"><span data-i18n="edgeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_edge"></span></span></span><span id="edge"></span></div>
+    <div class="ev-row" style="border-bottom:none;"><span class="ev-label"><span data-i18n="edgeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_edge"></span></span></span><span id="edge"></span></div>
   </div>
 
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="monthlyTitle"></div>
+    <div class="section-title"><span data-i18n="monthlyTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_monthly"></span></span></div>
     <div class="metric-grid">
       <div class="metric-card">
         <div class="metric-label" data-i18n="monthlyReturn"></div>
@@ -207,33 +222,15 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="chartTitle"></div>
-    <div class="controls" style="margin-bottom:0.75rem;">
-      <div class="control-row">
-        <label><span data-i18n="chartWindow"></span>: <span class="val" id="days-out">100</span> <span data-i18n="daysUnit"></span></label>
-        <input type="range" id="chartdays" min="7" max="1000" step="1" value="100">
-      </div>
-      <div class="control-row" style="justify-content:flex-end;">
-        <label style="visibility:hidden;">x</label>
-        <div style="font-size:12px;color:#aaa;margin-top:4px;" id="trades-in-window"></div>
-      </div>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-line" style="border-top:1px dashed #1D9E75;margin-top:1px;"></div><span data-i18n="sigma2up"></span></div>
-      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #1D9E75;margin-top:1px;"></div><span data-i18n="sigma1up"></span></div>
-      <div class="legend-item"><div class="legend-line" style="background:#185FA5;height:2px;"></div><span data-i18n="expectedMedian"></span></div>
-      <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #E24B4A;margin-top:1px;"></div><span data-i18n="sigma1lo"></span></div>
-      <div class="legend-item"><div class="legend-line" style="border-top:1px dashed #E24B4A;margin-top:1px;"></div><span data-i18n="sigma2lo"></span></div>
-    </div>
-    <div class="chart-wrap"><canvas id="eqChart"></canvas></div>
+    <div class="section-title"><span data-i18n="recoveryTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_recovery"></span></span></div>
+    <div id="recovery-table"></div>
+    <div style="font-size:11px;color:#888;margin-top:8px;font-style:italic;" data-i18n="recoveryDisclaimer"></div>
   </div>
-
-  <div id="verdict-box" class="alert-box" style="margin-top:1rem;"></div>
 
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="mcTitle"></div>
+    <div class="section-title"><span data-i18n="mcTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_mc"></span></span></div>
     <div class="controls" style="margin-bottom:1rem;">
       <div class="control-row">
         <label><span data-i18n="mcMonths"></span>: <span class="val" id="mc-months-out">6</span></label>
@@ -280,84 +277,119 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="section-title" data-i18n="saTitle"></div>
+    <div class="section-title"><span data-i18n="saTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_sa"></span></span></div>
     <p style="font-size:13px;color:#555;margin:0 0 1rem;" data-i18n="saDesc"></p>
     <div class="controls" style="margin-bottom:1rem;">
-      <div class="control-row">
-        <label data-i18n="saParamLabel"></label>
-        <select id="sa-param" style="padding:6px 10px;font-size:13px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;margin-top:4px;">
-          <option value="wr"   data-i18n-opt="saParamWR"></option>
-          <option value="rr"   data-i18n-opt="saParamRR"></option>
-          <option value="rpt"  data-i18n-opt="saParamRPT"></option>
-          <option value="mult" data-i18n-opt="saParamMult"></option>
-        </select>
-      </div>
       <div class="control-row">
         <label><span data-i18n="saMonths"></span>: <span class="val" id="sa-months-out">6</span></label>
         <input type="range" id="sa-months" min="1" max="36" step="1" value="6">
       </div>
+      <div class="control-row">
+        <label><span data-i18n="saMetric"></span></label>
+        <select id="sa-metric" style="padding:6px 10px;font-size:13px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;margin-top:4px;">
+          <option value="median" data-i18n-opt="saMetricMedian"></option>
+          <option value="ruin"   data-i18n-opt="saMetricRuin" selected></option>
+          <option value="p5"     data-i18n-opt="saMetricP5"></option>
+        </select>
+      </div>
     </div>
-    <button onclick="runSensitivity()" style="padding:7px 20px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;margin-bottom:1rem;" data-i18n="saRunBtn"></button>
+    <button onclick="runSensitivity()" style="padding:7px 20px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;margin-bottom:1.5rem;" data-i18n="saRunBtn"></button>
+
     <div id="sa-results" style="display:none;">
-      <div style="font-size:12px;color:#555;margin-bottom:4px;" id="sa-chart-label"></div>
-      <div style="position:relative;height:260px;"><canvas id="sa-chart"></canvas></div>
-      <div style="font-size:11px;color:#888;margin-top:8px;" data-i18n="saNote"></div>
+
+      <div style="font-size:12px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;" data-i18n="saSmLabel"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;">
+        <div>
+          <div style="font-size:11px;color:#555;margin-bottom:3px;" data-i18n="saParamWR"></div>
+          <div style="position:relative;height:160px;"><canvas id="sa-wr-chart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#555;margin-bottom:3px;" data-i18n="saParamRR"></div>
+          <div style="position:relative;height:160px;"><canvas id="sa-rr-chart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#555;margin-bottom:3px;" data-i18n="saParamRPT"></div>
+          <div style="position:relative;height:160px;"><canvas id="sa-rpt-chart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#555;margin-bottom:3px;" data-i18n="saParamMult"></div>
+          <div style="position:relative;height:160px;"><canvas id="sa-mult-chart"></canvas></div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:flex;align-items:center;"><span data-i18n="saHmLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_heatmap"></span></span></div>
+      <p style="font-size:12px;color:#555;margin:0 0 0.75rem;" data-i18n="saHmDesc"></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.5rem;">
+        <div>
+          <label style="font-size:12px;color:#555;" data-i18n="saHmXLabel"></label>
+          <select id="sa-hm-x" style="padding:5px 8px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#111;margin-left:6px;">
+            <option value="wr"   data-i18n-opt="saParamWR"></option>
+            <option value="rr"   data-i18n-opt="saParamRR"></option>
+            <option value="rpt"  data-i18n-opt="saParamRPT"></option>
+            <option value="mult" data-i18n-opt="saParamMult"></option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;" data-i18n="saHmYLabel"></label>
+          <select id="sa-hm-y" style="padding:5px 8px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#111;margin-left:6px;">
+            <option value="rr"   data-i18n-opt="saParamRR"></option>
+            <option value="wr"   data-i18n-opt="saParamWR"></option>
+            <option value="rpt"  data-i18n-opt="saParamRPT"></option>
+            <option value="mult" data-i18n-opt="saParamMult"></option>
+          </select>
+        </div>
+      </div>
+      <div style="position:relative;width:100%;overflow:hidden;">
+        <canvas id="sa-hm-chart" style="display:block;"></canvas>
+      </div>
+      <div id="sa-hm-legend" style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:4px;">
+        <span id="sa-hm-min"></span><span data-i18n="saHmLegendLabel"></span><span id="sa-hm-max"></span>
+      </div>
+
+      <div style="font-size:11px;color:#888;margin-top:12px;" data-i18n="saNote"></div>
     </div>
   </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-let eqChart = null;
 let currentLang = 'ko';
 
 const T = {
   ko: {
-    currencySymbol: '₩',
+    currencySymbol: '$',
+    mainTitle: '매매 전략 분석기',
     portfolioLabel: '포트폴리오 규모',
     portfolioError: '유효한 금액을 입력하세요',
     strategyParams: '전략 파라미터',
+    sizingTitle: '매매 전 포지션 사이징',
     winRate: '승률',
     rrRatio: '손익비',
-    tradesPerMonth: '월 거래 횟수',
-    riskPerTrade: '거래당 최대 손실 (포트폴리오 %)',
-    feePerTx: '거래당 수수료',
+    tradesPerMonth: '월 매매 횟수',
+    riskPerTrade: '매매당 최대 손실 (포트폴리오 %)',
+    feePerTx: '주문당 수수료 (매수 또는 매도 1회)',
     feeBreakdown: '비용 상세',
     entryFee: '진입 수수료 (매수)',
     exitFee: '청산 수수료 (매도)',
     totalFeeLabel: '왕복 총 수수료',
     slippageLabel: '슬리피지 (포지션 %)',
-    slippageCostLabel: '슬리피지 (손실의 10% 발생 가정)',
+    slippageCostLabel: '슬리피지 (패배 매매의 10%에서 발생 가정)',
     totalCostLabel: '총 비용 (수수료 + 슬리피지)',
     feeAsR: '총 비용 대비 1R (* ATR 미입력 시 최대손실% 사용)',
-    evTitle: '거래당 기대값',
+    evTitle: '매매당 기대값',
     grossEV: '총 기대값 (수수료 전)',
     netEV: '순 기대값 (수수료 후)',
     breakEvenWR: '손익분기 승률',
     edgeLabel: '손익분기 초과 우위',
+    kellyOptLabel: '켈리 최적 리스크',
+    kellyFracLabel: '현재 켈리 비율',
     monthlyTitle: '월간 예상 수익 (복리)',
     monthlyReturn: '예상 월 수익률',
     feeDrag: '월간 수수료 비용',
     maxLossesLabel: '연속 손실 (발생 확률 1%)',
-    chartTitle: '자산 곡선 (로그 스케일)',
-    chartWindow: '차트 기간',
-    daysUnit: '일',
-    sigma2up: '+2σ (상위 95%)',
-    sigma1up: '+1σ (상위 68%)',
-    expectedMedian: '예상 중앙값',
-    sigma1lo: '-1σ (하위 68%)',
-    sigma2lo: '-2σ (하위 95%)',
-    yAxisLabel: '포트폴리오 가치 (로그 스케일, 시작 = 100)',
-    xAxisLabel: '일',
+    recoveryTitle: '드로다운 회복 분석',
+    recoveryDisclaimer: '현재 기대값과 복리 성장률 기반 분석적 추정값입니다. 실제 회복 시간은 승패 순서에 따라 크게 달라질 수 있습니다.',
     inARow: '연속',
     drawdown: '손실액',
     ofPortfolio: '포트폴리오 손실',
-    tradesShown: '거래 표시',
-    tradeEveryPrefix: '평균',
-    tradeEverySuffix: '일마다 1거래',
-    tradesPerDay: '거래/일',
-    zeroTrades: '기간 내 거래 없음',
-    positiveAlert: (e) => `전략의 기대값이 양수입니다 — 손익분기 대비 ${e}%p 우위. 주의: 실제 승률은 백테스트보다 5~10%p 낮게 나오는 경향이 있습니다.`,
-    marginalAlert: (e) => `기대값이 간신히 양수입니다 — 손익분기 대비 ${e}%p 우위. 실제 승률이 조금만 낮아져도 음수가 될 수 있습니다.`,
-    negativeAlert: '현재 설정에서 기대값이 음수입니다. 손익비를 높이거나, 승률을 개선하거나, 수수료를 줄이세요.',
     naRatio: '해당 없음 (0R 목표)',
     naFee: '해당 없음 (리스크 0%)',
     infiniteLosses: '∞ (승률 0%)',
@@ -365,8 +397,8 @@ const T = {
     yours: '현재',
     ofPosition: '포지션의',
     feeStr: (pct) => `포지션의 ${pct}%`,
-    presetsLabel: '시장 프리셋 (실시간 데이터)',
-    unstableNote: '⚠ 빨간 테두리 버튼은 Yahoo Finance를 사용하며 불안정할 수 있습니다.',
+    presetsLabel: '시장 프리셋',
+    unstableNote: '⚠ 클릭 시 무료 API에서 현재 가격과 ATR을 1회 조회합니다. 반복 클릭 시 요청이 제한될 수 있습니다.',
     customLabel: '직접 입력',
     customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
@@ -379,6 +411,7 @@ const T = {
     stopDistLabel: '손절 거리 (진입가 기준 %)',
     posSizeLabel: '권장 포지션 크기',
     noiseRiskLabel: '노이즈 손절 위험',
+    atrPctileLabel: 'ATR 변동성 위치',
     leverageWarning: ' ⚠ 레버리지 필요',
     atrDisclaimer: 'ATR은 평균 일일 범위를 나타내며 가격의 분포를 모델링하지 않습니다. 위험 수준은 정확한 확률이 아닌 정성적 지침입니다.',
     noiseRiskFn: (mult) => {
@@ -400,46 +433,74 @@ const T = {
     mcP5sub: '95% 확률로 이보다 좋음',
     mcFanLabel: '경로 샘플 (50개) + 백분위수',
     mcHistLabel: '최종 포트폴리오 분포',
-    mcNote: '1,000회 무작위 시뮬레이션. 각 거래는 독립적인 베르누이 시행. 실제 거래는 상관관계, 체계적 편향, 체제 변화가 있을 수 있음.',
+    mcNote: '1,000회 무작위 시뮬레이션. 각 매매는 독립적인 베르누이 시행. 실제 매매는 상관관계, 체계적 편향, 체제 변화가 있을 수 있음.',
     saTitle: '민감도 분석',
-    saDesc: '하나의 파라미터를 전체 범위에 걸쳐 변화시키면서 수익률 중앙값, 파산 확률, 하위 5% 결과가 어떻게 바뀌는지 확인합니다. 실제 거래 기록과 비교하여 파라미터를 보정하는 데 활용하세요.',
-    saParamLabel: '분석할 파라미터',
+    saDesc: '모든 파라미터를 동시에 분석합니다. 소형 다중 차트는 각 파라미터의 기울기를 보여주고, 히트맵은 두 파라미터 간의 상호작용을 보여줍니다.',
+    saMonths: '기간 (개월)',
+    saMetric: '분석 지표',
+    saMetricMedian: '수익률 중앙값 %',
+    saMetricRuin: '파산 확률 %',
+    saMetricP5: '하위 5% 수익률',
     saParamWR: '승률',
     saParamRR: '손익비 (R)',
-    saParamRPT: '거래당 최대 손실 %',
+    saParamRPT: '최대 손실 %',
     saParamMult: '손절 배수 (ATR×)',
-    saMonths: '기간 (개월)',
     saRunBtn: '민감도 분석 실행',
+    saSmLabel: '단일 파라미터 민감도',
+    saHmLabel: '2D 히트맵 — 파라미터 상호작용',
+    saHmDesc: '두 파라미터를 선택하면 나머지는 현재 값으로 고정됩니다.',
+    saHmXLabel: 'X축:',
+    saHmYLabel: 'Y축:',
+    saHmLegendLabel: '← 낮음 / 높음 →',
     saNote: '각 포인트마다 200회 시뮬레이션. 방향성 파악용이며 정밀 최적화 도구가 아닙니다.',
     tips: {
-      tip_wr:        '전략이 실현된 히스토리 또는 목표에 기반한 거래 성공 비율.',
+      tip_wr:        '전략이 실현된 히스토리 또는 목표에 기반한 매매 성공 비율.',
       tip_rr:        '이익 목표와 손절 거리의 비율. 2.5R = 손절의 2.5배 수익 목표.',
-      tip_tm:        '한 달 동안 실행할 예상 거래 수.',
-      tip_rpt:       '단일 거래에서 허용할 최대 손실액 (포트폴리오 대비 %). 리스크 허용 범위에 따라 직접 설정.',
+      tip_tm:        '한 달 동안 실행할 예상 매매 수 (진입+청산 = 1 매매).',
+      tip_rpt:       '단일 매매에서 허용할 최대 손실액 (포트폴리오 대비 %). 리스크 허용 범위에 따라 직접 설정.',
       tip_atr:       '14일 평균 실제 범위를 현재 가격으로 나눈 값. 일반적인 일일 변동성을 나타냄. 차팅 플랫폼에서 확인 가능.',
       tip_mult:      'ATR의 배수로 손절을 설정해 일반적인 노이즈 위에 여유 공간 확보. 1.5× 이하는 일반 변동성에 자주 손절될 수 있음.',
-      tip_fee:       '진입 또는 청산 시 1회 거래당 수수료 (포지션 크기 대비 %). 왕복 비용은 2×.',
+      tip_fee:       '매수 또는 매도 주문 1건당 수수료 (포지션 크기 대비 %). 왕복(매수+매도) 비용은 2×.',
       tip_slip:      '손절이 빠르게 움직이는 시장에서 지정가보다 불리한 가격에 체결될 때 발생. 포지션 크기 대비 %로 입력.',
       tip_stopDist:  '진입가 대비 손절 위치의 거리 (ATR% × 손절 배수).',
       tip_stopDollar:'현재 가격 기준 손절까지의 절대 금액 또는 포인트 거리.',
       tip_posSize:   '손절 시 최대 손실이 정확히 최대 손실%가 되도록 유지하는 권장 포지션 크기. = 최대 손실% ÷ 손절 거리%.',
       tip_noiseRisk: '손절 배수가 ATR 대비 얼마나 멀리 있는지에 따른 노이즈 손절의 정성적 위험 지표.',
       tip_totalFee:  '수수료율 × 2 (매수 + 매도). 스케일 인/아웃 시에도 총 포지션 비중이 같으면 동일.',
-      tip_slipCost:  '슬리피지는 손실의 약 10%에서 발생한다고 가정 (유동성 높은 시장 기준). 포지션 대비 % × 10%.',
+      tip_slipCost:  '슬리피지는 패배 매매의 약 10%에서 발생한다고 가정합니다 (유동성 높은 시장 기준). 슬리피지 % × 10% 발생 빈도.',
       tip_totalCost: '수수료 + 예상 슬리피지 비용의 합계.',
       tip_feeR:      '총 비용이 1R (손절 금액) 대비 차지하는 비율. ATR 손절 거리를 기준으로 계산.',
       tip_grossEV:   '비용 없이 계산한 기대값. wr × R − (1−wr) × 1.',
       tip_netEV:     '수수료와 슬리피지를 반영한 실제 기대값. 이 값이 양수여야 전략이 수익성이 있음.',
       tip_beWR:      '순 기대값이 0이 되는 최소 승률. 현재 승률이 이 값보다 높아야 수익 전략.',
       tip_edge:      '현재 승률과 손익분기 승률의 차이. 실제 전략에서는 백테스트보다 5~10%p 낮을 수 있음.',
+      tip_kellyOpt:  '켈리 기준으로 최적의 리스크 비율. 수학적으로 장기 성장률을 극대화하는 비율이지만, 실전에서는 변동성이 극도로 높아 직접 사용하기 어려움.',
+      tip_kellyFrac: '현재 최대 손실%가 켈리 최적 비율의 몇 %인지. 0.25 이하는 보수적, 0.5 전후는 적절, 0.75 이상은 공격적.',
+      tip_atrPctile: '현재 ATR이 최근 60일 ATR 분포에서 어디에 위치하는지. 높은 백분위는 평소보다 변동성이 큰 구간임을 나타냄.',
       tip_mcRuin:    '포트폴리오가 이 손실률에 도달하면 파산으로 간주. 개인 리스크 허용 범위에 따라 설정.',
+    },
+    stips: {
+      stip_presets:   '시장 프리셋을 클릭하면 현재 가격과 ATR%를 무료 API에서 1회 조회합니다. 자동 갱신되지 않으며, 새 데이터가 필요하면 다시 클릭하세요. BTC는 Kraken, SPY/QQQ/ES/NQ는 Yahoo Finance를 사용합니다. 무료 API이므로 반복 클릭 시 요청이 제한되거나 실패할 수 있습니다.',
+      stip_portfolio: '총 매매 자본금. 모든 달러 금액 계산의 기준이 됩니다. 실제 매매 계좌 잔액을 입력하세요.',
+      stip_params:    '전략의 핵심 가정값입니다. 승률과 손익비는 당신의 엣지를 나타내며 백테스트나 실거래 기록에서 도출해야 합니다. ATR과 손절 배수는 포지션 사이징에 영향을 미칩니다. 수수료와 슬리피지는 매매 비용을 반영합니다.',
+      stip_sizing:    '이 섹션은 ATR 기반 손절 거리와 최대 손실 %를 결합하여 포지션 크기를 도출합니다. 핵심 공식: 포지션 크기 = 최대 손실% ÷ 손절 거리%. 이렇게 하면 손절 시 손실이 정확히 최대 손실%가 됩니다.',
+      stip_fees:      '총 매매 비용을 1R(손절 금액) 대비 비율로 분석합니다. 수수료가 기대값에 얼마나 영향을 주는지 보여줍니다. 비용이 높을수록 손익분기 승률이 높아집니다.',
+      stip_ev:        '기대값(EV)은 장기적으로 매매당 평균 얼마를 버는지 나타냅니다. 순 EV가 양수여야 전략이 장기적으로 수익성이 있습니다. 손익분기 승률은 EV가 0이 되는 최소 승률입니다.',
+      stip_monthly:   '현재 파라미터로 월간 복리 수익률을 계산합니다. 단순 합산이 아닌 기하평균을 사용하므로 실제 복리 효과가 반영됩니다. 비용 드래그는 수수료와 슬리피지로 인해 손실되는 월간 수익률입니다.',
+      stip_recovery:  '드로다운 발생 시 현재 전략의 복리 성장률로 회복에 필요한 매매 수와 기간을 보여줍니다. 기대값이 음수이면 회복이 불가능합니다. 실제 회복 시간은 승패 순서에 따라 크게 달라질 수 있습니다.',
+      stip_chart:     '로그 스케일 자산 곡선입니다. 중앙값은 기하평균 경로이며, σ 밴드는 매매 결과의 분산을 나타냅니다. 이 곡선은 분석적(수학적) 근사값입니다. 실제 분포를 보려면 몬테카를로 섹션을 사용하세요.',
+      stip_mc:        '몬테카를로 시뮬레이션은 1,000번의 무작위 매매 시퀀스를 실행하여 결과의 실제 분포를 보여줍니다. 승리와 손실의 순서가 다르면 복리 효과로 인해 최종 결과가 크게 달라질 수 있습니다. 파산 확률은 실거래 전 리스크를 평가하는 핵심 지표입니다.',
+      stip_sa:        '민감도 분석은 각 파라미터가 결과에 얼마나 영향을 미치는지 보여줍니다. 실거래 기록과 비교하여 파라미터를 보정하는 데 사용합니다. 예: 실제 승률이 목표보다 낮다면, 승률 곡선에서 현재 위치를 확인하고 최대 손실%를 조정하여 파산 확률을 허용 수준으로 유지하세요.',
+      stip_heatmap:   '두 파라미터를 동시에 변화시켜 상호작용 효과를 보여줍니다. 파라미터가 독립적이라면 대각선 방향의 부드러운 그라데이션이 나타납니다. 날카로운 경계나 비선형 패턴은 두 파라미터 간에 중요한 상호작용이 있음을 의미합니다. 녹색 영역은 안전 구간, 빨간 영역은 위험 구간입니다. 현재 하이라이트된 셀이 파라미터 불확실성에 얼마나 강건한지 파악하는 데 사용하세요 — 승률이나 손익비 가정이 조금 틀렸을 때 셀이 여전히 녹색인지, 아니면 빠르게 빨간색으로 변하는지 확인하세요.',
     },
   },
   en: {
     currencySymbol: '$',
+    mainTitle: 'Interactive Trading Strategy Analyzer',
     portfolioLabel: 'Portfolio size',
     portfolioError: 'Enter a valid amount',
     strategyParams: 'Strategy parameters',
+    sizingTitle: 'Pre-trade position sizing',
     winRate: 'Win rate',
     rrRatio: 'Reward:Risk ratio',
     tradesPerMonth: 'Trades per month',
@@ -450,7 +511,7 @@ const T = {
     exitFee: 'Exit fee (sell)',
     totalFeeLabel: 'Total round-trip fee',
     slippageLabel: 'Slippage (% of position)',
-    slippageCostLabel: 'Slippage (assumed 10% of losses)',
+    slippageCostLabel: 'Slippage (assumed on 10% of losing trades)',
     totalCostLabel: 'Total cost (fees + slippage)',
     feeAsR: 'Total cost as % of 1R (* uses max loss % if ATR not set)',
     evTitle: 'Expected value per trade',
@@ -458,51 +519,38 @@ const T = {
     netEV: 'Net EV (after fees)',
     breakEvenWR: 'Break-even win rate needed',
     edgeLabel: 'Your edge above break-even',
+    kellyOptLabel: 'Kelly optimal risk',
+    kellyFracLabel: 'Current Kelly fraction',
     monthlyTitle: 'Monthly projection (compounded)',
     monthlyReturn: 'Expected monthly return',
     feeDrag: 'Fee drag per month',
     maxLossesLabel: 'Consecutive losses (1% chance)',
-    chartTitle: 'Equity curve (log scale)',
-    chartWindow: 'Chart window',
-    daysUnit: 'days',
-    sigma2up: '+2σ (95th percentile)',
-    sigma1up: '+1σ (84th percentile)',
-    expectedMedian: 'Expected median',
-    sigma1lo: '-1σ (16th percentile)',
-    sigma2lo: '-2σ (5th percentile)',
-    yAxisLabel: 'Portfolio value (log scale, start = 100)',
-    xAxisLabel: 'Days',
+    recoveryTitle: 'Drawdown recovery analysis',
+    recoveryDisclaimer: 'Analytical estimates based on current EV and compound growth rate. Actual recovery time varies significantly depending on the sequence of wins and losses.',
     inARow: 'in a row',
     drawdown: 'drawdown',
     ofPortfolio: 'of portfolio lost',
-    tradesShown: 'trades shown',
-    tradeEveryPrefix: 'avg 1 trade every',
-    tradeEverySuffix: 'days',
-    tradesPerDay: 'trades/day',
-    zeroTrades: '0 trades in window',
-    positiveAlert: (e) => `Strategy has positive EV with a ${e}pp edge. Main risk is execution: real win rates often run 5–10pp below backtest estimates.`,
-    marginalAlert: (e) => `Marginally positive EV — only ${e}pp above break-even. A small dip in real-world win rate could turn this negative.`,
-    negativeAlert: 'Negative expected value with current settings. Either raise your R:R target, improve win rate, or reduce fees.',
     naRatio: 'n/a (0R target)',
     naFee: 'n/a (0% risk)',
     infiniteLosses: '∞ (0% win rate)',
     ppUnit: 'pp',
     yours: 'yours',
     ofPosition: 'of position',
-    presetsLabel: 'Market presets (live data)',
-    unstableNote: '⚠ Red-outlined buttons use Yahoo Finance and may be unreliable.',
+    presetsLabel: 'Market presets',
+    unstableNote: '⚠ Clicking a preset queries current price and ATR once via free APIs. Repeated clicks may get throttled.',
     customLabel: 'Custom',
     customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
     stopDollarLabel: 'Stop distance (price terms)',
-    fetchingLabel: 'Loading live data...',
-    fetchErrorLabel: 'Could not load live data. Check your internet connection.',
+    fetchingLabel: 'Fetching data...',
+    fetchErrorLabel: 'Could not fetch data. Check your connection or try again later.',
     liveDataNote: (sym, price) => `${sym} — price ${price} (Yahoo Finance / Binance, unofficial)`,
     atrLabel: 'Current ATR%',
     stopMultLabel: 'Stop multiple (× ATR)',
     stopDistLabel: 'Stop distance (% of entry price)',
     posSizeLabel: 'Suggested position size',
     noiseRiskLabel: 'Noise stop-out risk',
+    atrPctileLabel: 'ATR volatility regime',
     leverageWarning: ' ⚠ requires leverage',
     atrDisclaimer: 'ATR measures the average daily range but does not model the distribution of price within that range. Risk levels are qualitative guidelines, not precise probabilities.',
     noiseRiskFn: (mult) => {
@@ -527,14 +575,23 @@ const T = {
     mcHistLabel: 'Final portfolio value distribution',
     mcNote: '1,000 random simulations. Each trade is an independent Bernoulli trial. Real trading may have correlated losses, systematic biases, and regime changes not captured here.',
     saTitle: 'Sensitivity analysis',
-    saDesc: 'Sweeps one parameter across its full range and shows how median return, ruin probability, and the 5th percentile outcome change. Use this to calibrate parameters against your live trading record.',
-    saParamLabel: 'Parameter to analyze',
+    saDesc: 'Analyzes all parameters simultaneously. Small multiples show the slope of each parameter independently; the heatmap reveals interaction effects between any two.',
+    saMonths: 'Horizon (months)',
+    saMetric: 'Output metric',
+    saMetricMedian: 'Median return %',
+    saMetricRuin: 'Ruin probability %',
+    saMetricP5: '5th percentile return %',
     saParamWR: 'Win rate',
     saParamRR: 'Reward:Risk ratio (R)',
     saParamRPT: 'Max loss per trade %',
     saParamMult: 'Stop multiple (ATR×)',
-    saMonths: 'Horizon (months)',
     saRunBtn: 'Run sensitivity analysis',
+    saSmLabel: 'Single-parameter sensitivity',
+    saHmLabel: '2D heatmap — parameter interaction',
+    saHmDesc: 'Select two parameters to sweep; all others are held at current values.',
+    saHmXLabel: 'X axis:',
+    saHmYLabel: 'Y axis:',
+    saHmLegendLabel: '← low / high →',
     saNote: '200 simulations per point — sufficient for directional insight, not precise optimization.',
     tips: {
       tip_wr:        'Percentage of trades that result in a win, based on historical results or your target.',
@@ -557,7 +614,24 @@ const T = {
       tip_netEV:     'Expected value after fees and slippage. Must be positive for the strategy to be profitable long-term.',
       tip_beWR:      'The minimum win rate at which net EV equals zero. Your actual win rate must exceed this.',
       tip_edge:      'Gap between your win rate and break-even. Real-world win rates often run 5–10pp below backtest estimates.',
+      tip_kellyOpt:  'The Kelly criterion optimal risk fraction — mathematically maximizes long-term growth rate. In practice, full Kelly produces extreme volatility and is rarely used directly.',
+      tip_kellyFrac: 'Your current max loss % as a fraction of Kelly optimal. Below 0.25 is conservative, around 0.5 is moderate, above 0.75 is aggressive.',
+      tip_atrPctile: 'Where the current ATR sits in the distribution of ATR values over the past 60 days. A high percentile means volatility is elevated relative to recent history.',
       tip_mcRuin:    'A simulation path is counted as "ruin" if the portfolio drawdown ever hits this threshold. Set based on your personal pain tolerance.',
+    },
+    stips: {
+      stip_presets:   'Clicking a preset fetches the current price and ATR% once from a free API. Data does not auto-refresh — click again if you need updated values. BTC uses Kraken; SPY, QQQ, ES, and NQ use Yahoo Finance. Repeated clicks may be rate-limited or fail since these are free, unofficial APIs.',
+      stip_portfolio: 'Your total trading capital. This is the base for all dollar calculations. Enter your actual account balance.',
+      stip_params:    'The core assumptions of your strategy. Win rate and R:R represent your edge — derive these from backtests or live records. ATR and stop multiple determine position sizing. Fee and slippage represent your cost of trading.',
+      stip_sizing:    'Derives position size from ATR-based stop distance and your max loss %. Core formula: position size = max loss % ÷ stop distance %. This ensures that if stopped out, your loss is exactly your max loss % — no more, no less.',
+      stip_fees:      'Breaks down total trading cost as a fraction of 1R (your stop loss amount). Shows how much fees erode your expected value. Higher costs mean a higher break-even win rate is required just to stay flat.',
+      stip_ev:        'Expected value (EV) is how much you make per trade on average over the long run. Net EV must be positive for the strategy to be profitable. The break-even win rate is the minimum win rate at which EV equals zero — you must exceed it.',
+      stip_monthly:   'Projects monthly return using geometric compounding — not a simple sum, so it correctly models the real effect of compounding wins and losses. Cost drag shows how much monthly return is lost purely to fees and slippage.',
+      stip_recovery:  'Shows how many trades and months it takes to recover from various drawdown levels at your current compound growth rate. If EV is negative, recovery is impossible. Actual recovery time varies significantly depending on the sequence of wins and losses.',
+      stip_chart:     'Log-scale equity curve. The median line is the geometric mean path; sigma bands show the spread of outcomes based on variance. This is an analytical (mathematical) approximation — for the empirical distribution, use the Monte Carlo section below.',
+      stip_mc:        'Monte Carlo runs 1,000 random sequences of wins and losses to show the true distribution of outcomes. Because of compounding, the order of wins and losses matters — an early losing streak is far more damaging than a late one. Ruin probability is the key metric for evaluating whether your current sizing is safe before you start trading.',
+      stip_sa:        'Sensitivity analysis shows which parameters have the most impact on your outcomes and how steep the slope is. Use it to calibrate parameters against your live trading record. For example: if your real win rate comes in below your target, find your new position on the win rate curve and read off what max loss % you need to keep ruin probability acceptable.',
+      stip_heatmap:   'Shows the interaction between two parameters simultaneously. If parameters were independent you would see smooth diagonal gradients. Sharp boundaries or non-linear patterns mean the two parameters interact — typically this appears as a risk cliff where a small shift in both directions moves you from safe to dangerous. Stay well inside the green zone. Use this to gauge how robust your current setup is against parameter uncertainty — if your assumptions about win rate or R:R turn out to be slightly wrong, does the highlighted cell stay green or does it quickly turn red?',
     },
   }
 };
@@ -573,9 +647,10 @@ function applyStaticText() {
   });
   document.querySelectorAll('[data-i18n-tip]').forEach(el => {
     const key = el.getAttribute('data-i18n-tip');
-    if (T[currentLang].tips && T[currentLang].tips[key]) {
-      el.textContent = T[currentLang].tips[key];
-    }
+    const src = T[currentLang].tips || {};
+    const stip = T[currentLang].stips || {};
+    if (src[key])  el.textContent = src[key];
+    if (stip[key]) el.textContent = stip[key];
   });
   document.querySelectorAll('[data-i18n-opt]').forEach(el => {
     const key = el.getAttribute('data-i18n-opt');
@@ -584,6 +659,7 @@ function applyStaticText() {
   document.getElementById('currency-prefix').textContent = t('currencySymbol');
   document.getElementById('portfolio-error').textContent = t('portfolioError');
   document.getElementById('lang-btn').textContent = t('langToggleBtn');
+  document.getElementById('main-title').textContent = t('mainTitle');
 }
 
 function toggleLang() {
@@ -614,7 +690,6 @@ function getVals() {
     rpt:       parseInt(document.getElementById('rpt').value) / 10,
     fee:       parseInt(document.getElementById('fee').value) / 100,
     slip:      parseInt(document.getElementById('slippage').value) / 100,
-    chartDays: parseInt(document.getElementById('chartdays').value),
     portfolio: getPortfolio()
   };
 }
@@ -627,7 +702,7 @@ function calcPTF(wr, netWinFrac, netLossFrac) {
 }
 
 function update() {
-  const { wr, rr, tm, rpt, fee, slip, chartDays, portfolio } = getVals();
+  const { wr, rr, tm, rpt, fee, slip, portfolio } = getVals();
 
   const errEl     = document.getElementById('portfolio-error');
   const portInput = document.getElementById('portfolio');
@@ -652,7 +727,6 @@ function update() {
   document.getElementById('rpt-out').textContent  = rpt.toFixed(1) + '%';
   document.getElementById('fee-out').textContent  = fee.toFixed(2) + '%';
   document.getElementById('slip-out').textContent = slip.toFixed(2) + '%';
-  document.getElementById('days-out').textContent = chartDays;
 
   // Use stopDist as R denominator when ATR is set; fall back to rpt (assumes 100% position)
   const SLIP_FREQ  = 0.10;
@@ -681,7 +755,7 @@ function update() {
   const netLoss = 1 + totalCostR;
   const grossEV = wr * rr - (1 - wr);
   const netEV   = wr * netWin - (1 - wr) * netLoss;
-  const beWR    = rr > 0 ? (1 + totalCostR) / (rr + 1) : null;
+  const beWR    = rr > 0 ? (1 + totalCostR) / (rr + 1 + slipAsR) : null;
 
   document.getElementById('ev-gross').textContent = grossEV.toFixed(3) + 'R (' + (grossEV * R).toFixed(2) + '%)  ' + fmt(grossEV * riskPerTrade);
   const evNetEl = document.getElementById('ev-net');
@@ -696,6 +770,23 @@ function update() {
   const edgeVal = beWR !== null ? wr - beWR : 0;
   edgeEl.textContent = beWR !== null ? (edgeVal * 100).toFixed(1) + t('ppUnit') : 'n/a';
   edgeEl.style.color = edgeVal > 0.05 ? '#1D9E75' : edgeVal > 0 ? '#BA7517' : '#E24B4A';
+
+  // Kelly criterion: for asymmetric binary payoffs, optimal rpt = 100 × EV / (win × loss)
+  // This maximizes E[log(equity)] over repeated independent bets
+  const kellyOptEl  = document.getElementById('kelly-opt');
+  const kellyFracEl = document.getElementById('kelly-frac');
+  if (netEV > 0 && netWin > 0 && netLoss > 0) {
+    const kellyPct  = 100 * netEV / (netWin * netLoss); // optimal risk as % of portfolio
+    const kellyR    = kellyPct / R;                      // as multiple of current 1R unit
+    const kellyFrac = rpt / kellyPct;                    // user's fraction of Kelly
+    kellyOptEl.textContent  = kellyPct.toFixed(2) + '% ' + (currentLang === 'ko' ? '포트폴리오' : 'of portfolio') + '  (' + kellyR.toFixed(1) + 'R)';
+    kellyFracEl.textContent = kellyFrac.toFixed(2) + '× Kelly';
+    kellyFracEl.style.color = kellyFrac <= 0.3 ? '#1D9E75' : kellyFrac <= 0.5 ? '#1D9E75' : kellyFrac <= 0.75 ? '#BA7517' : '#E24B4A';
+  } else {
+    kellyOptEl.textContent  = netEV <= 0 ? (currentLang === 'ko' ? '해당 없음 (음수 기대값)' : 'n/a (negative EV)') : 'n/a';
+    kellyFracEl.textContent = '—';
+    kellyFracEl.style.color = '#555';
+  }
 
   const netWinFrac  = netWin  * R / 100;
   const netLossFrac = netLoss * R / 100;
@@ -731,6 +822,39 @@ function update() {
   document.getElementById('max-losses-pct').textContent = maxLoss > 0 && maxLoss < 99999 && drawdownPct > 0
     ? drawdownPct.toFixed(1) + '% ' + t('ofPortfolio') : '';
 
+  // Drawdown recovery table
+  const recoveryEl = document.getElementById('recovery-table');
+  const ddLevels = [5, 10, 15, 20, 30, 40];
+  const logPtf = Math.log(ptf);
+  if (ptf > 1 && tm > 0) {
+    const hdrDD     = currentLang === 'ko' ? '드로다운' : 'Drawdown';
+    const hdrTrades = currentLang === 'ko' ? '회복 매매 수' : 'Trades to recover';
+    const hdrTime   = currentLang === 'ko' ? '예상 기간' : 'Est. time';
+    let html = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;font-size:13px;">`;
+    html += `<div style="padding:6px 8px;font-weight:500;color:#555;border-bottom:1px solid #e8e8e8;">${hdrDD}</div>`;
+    html += `<div style="padding:6px 8px;font-weight:500;color:#555;border-bottom:1px solid #e8e8e8;">${hdrTrades}</div>`;
+    html += `<div style="padding:6px 8px;font-weight:500;color:#555;border-bottom:1px solid #e8e8e8;">${hdrTime}</div>`;
+    ddLevels.forEach(dd => {
+      const trades = Math.ceil(-Math.log(1 - dd / 100) / logPtf);
+      const months = trades / tm;
+      const timeStr = months < 1
+        ? (months * 30).toFixed(0) + (currentLang === 'ko' ? '일' : 'd')
+        : months.toFixed(1) + (currentLang === 'ko' ? '개월' : 'mo');
+      const color = months <= 2 ? '#1D9E75' : months <= 6 ? '#BA7517' : '#E24B4A';
+      html += `<div style="padding:5px 8px;border-bottom:1px solid #f0f0f0;">-${dd}%</div>`;
+      html += `<div style="padding:5px 8px;border-bottom:1px solid #f0f0f0;">${trades.toLocaleString()}</div>`;
+      html += `<div style="padding:5px 8px;border-bottom:1px solid #f0f0f0;color:${color};font-weight:500;">${timeStr}</div>`;
+    });
+    html += `</div>`;
+    recoveryEl.innerHTML = html;
+  } else {
+    recoveryEl.innerHTML = `<div style="font-size:13px;color:#888;padding:8px 0;">${
+      ptf <= 1
+        ? (currentLang === 'ko' ? '기대값이 양수가 아니어서 회복이 불가능합니다.' : 'Recovery impossible — per-trade growth factor is not positive.')
+        : (currentLang === 'ko' ? '월 매매 횟수를 설정하세요.' : 'Set trades per month to see recovery estimates.')
+    }</div>`;
+  }
+
   // ATR pre-trade sizing display
   document.getElementById('atr-out').textContent    = atrPct.toFixed(1) + '%';
   document.getElementById('mult-out').textContent   = stopMult.toFixed(1) + '×';
@@ -740,116 +864,13 @@ function update() {
   const noiseEl  = document.getElementById('noise-risk');
   noiseEl.textContent = riskInfo.label;
   noiseEl.style.color = riskInfo.color;
-
-  buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFrac, portfolio);
-
-  const verdict = document.getElementById('verdict-box');
-  const edgeStr = (edgeVal * 100).toFixed(1);
-  if (netEV <= 0) {
-    verdict.className   = 'alert-box alert-warning';
-    verdict.textContent = t('negativeAlert');
-  } else if (edgeVal < 0.03) {
-    verdict.className   = 'alert-box alert-warning';
-    verdict.textContent = t('marginalAlert')(edgeStr);
-  } else {
-    verdict.className   = 'alert-box alert-good';
-    verdict.textContent = t('positiveAlert')(edgeStr);
-  }
-}
-
-function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFrac, portfolio) {
-  const tradesPerDay = tm / 30;
-  const numTrades    = Math.max(1, Math.round(chartDays * tradesPerDay));
-  const cappedTrades = Math.min(numTrades, 5000);
-
-  const a    = Math.log(1 + netWinFrac);
-  const b    = Math.log(Math.max(1 - netLossFrac, 0.000001));
-  const diff = Math.abs(a - b);
-
-  const infoEl = document.getElementById('trades-in-window');
-  if (tm === 0) {
-    infoEl.textContent = t('zeroTrades');
-  } else if (tradesPerDay < 1) {
-    infoEl.textContent = t('tradeEveryPrefix') + ' ' + (30 / tm).toFixed(1) + ' ' + t('tradeEverySuffix') + ' — ' + cappedTrades + ' ' + t('tradesShown');
-  } else {
-    infoEl.textContent = tradesPerDay.toFixed(1) + ' ' + t('tradesPerDay') + ' — ' + cappedTrades + ' ' + t('tradesShown');
-  }
-
-  const step = Math.max(1, Math.floor(cappedTrades / 300));
-  const medSeries = [100], s1up = [100], s1lo = [100], s2up = [100], s2lo = [100], labels = ['0'];
-  let med = 100;
-
-  for (let i = 1; i <= cappedTrades; i++) {
-    med *= ptf;
-    if (i % step === 0 || i === cappedTrades) {
-      const day   = tradesPerDay > 0 ? i / tradesPerDay : 0;
-      const sigma = diff * Math.sqrt(i * wr * (1 - wr));
-      labels.push(day % 1 === 0 ? day.toFixed(0) : day.toFixed(1));
-      medSeries.push(parseFloat(med.toFixed(4)));
-      s1up.push(parseFloat((med * Math.exp(sigma)).toFixed(4)));
-      s1lo.push(parseFloat(Math.max(med * Math.exp(-sigma), 0.000001).toFixed(6)));
-      s2up.push(parseFloat((med * Math.exp(2 * sigma)).toFixed(4)));
-      s2lo.push(parseFloat(Math.max(med * Math.exp(-2 * sigma), 0.000001).toFixed(6)));
-    }
-  }
-
-  const curr = t('currencySymbol');
-
-  if (eqChart) eqChart.destroy();
-  eqChart = new Chart(document.getElementById('eqChart'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: t('sigma2up'),       data: s2up,      borderColor: '#1D9E75', borderWidth: 1,   borderDash: [2,5], pointRadius: 0, fill: false },
-        { label: t('sigma1up'),       data: s1up,      borderColor: '#1D9E75', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false },
-        { label: t('expectedMedian'), data: medSeries, borderColor: '#185FA5', borderWidth: 2,   borderDash: [],    pointRadius: 0, fill: false },
-        { label: t('sigma1lo'),       data: s1lo,      borderColor: '#E24B4A', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, fill: false },
-        { label: t('sigma2lo'),       data: s2lo,      borderColor: '#E24B4A', borderWidth: 1,   borderDash: [2,5], pointRadius: 0, fill: false }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 0 },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              const val    = ctx.parsed.y;
-              const absVal = portfolio * val / 100;
-              const absStr = curr + Math.round(absVal).toLocaleString();
-              return ctx.dataset.label + ':  ' + val.toFixed(1) + '  (' + absStr + ')';
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          title: { display: true, text: t('xAxisLabel'), font: { size: 12 }, color: '#888' },
-          ticks: { maxTicksLimit: 10, autoSkip: true }
-        },
-        y: {
-          type: 'logarithmic',
-          title: { display: true, text: t('yAxisLabel'), font: { size: 12 }, color: '#888' },
-          ticks: {
-            callback: function(value) {
-              const targets = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 25, 50, 100, 200, 500, 1000, 5000, 10000, 100000, 1000000];
-              return targets.includes(value) ? value.toLocaleString() : null;
-            }
-          }
-        }
-      }
-    }
-  });
 }
 
 applyStaticText();
 const portEl = document.getElementById('portfolio');
 portEl.addEventListener('input', update);
 portEl.addEventListener('blur', formatPortfolioInput);
-['wr','rr','tm','rpt','fee','slippage','chartdays','atr','stopmult'].forEach(id => {
+['wr','rr','tm','rpt','fee','slippage','atr','stopmult'].forEach(id => {
   document.getElementById(id).addEventListener('input', update);
 });
 setActiveBtn('custom');
@@ -859,6 +880,7 @@ update();
 
 let livePrice = null;
 let livePriceUnit = '$';
+let liveAtrPctile = null;
 let activePreset = 'custom';
 
 function setActiveBtn(key) {
@@ -894,11 +916,18 @@ function parseOHLCV(rows, mapper) {
   const n = 14;
   if (trs.length < n) throw new Error('Not enough data for ATR-14');
   let atr = trs.slice(0, n).reduce((a, b) => a + b, 0) / n;
+  const atrSeries = [atr];
   for (let i = n; i < trs.length; i++) {
     atr = (atr * (n - 1) + trs[i]) / n;
+    atrSeries.push(atr);
   }
 
-  return { price, atrPct: (atr / price) * 100 };
+  // Percentile rank: what fraction of the ATR series is below the current value
+  const currentAtr = atrSeries[atrSeries.length - 1];
+  const below = atrSeries.filter(v => v < currentAtr).length;
+  const atrPctile = Math.round((below / atrSeries.length) * 100);
+
+  return { price, atrPct: (currentAtr / price) * 100, atrPctile };
 }
 
 async function timedFetch(url, ms = 8000) {
@@ -1023,10 +1052,10 @@ async function loadPreset(key) {
   errEl.style.display = 'none';
   badge.innerHTML = '';
 
-  // Custom: just show the input, no fetch
   if (key === 'custom') {
-    livePrice     = null;
-    activePreset  = 'custom';
+    livePrice      = null;
+    liveAtrPctile  = null;
+    activePreset   = 'custom';
     const v = parseFloat(document.getElementById('custom-price').value);
     if (!isNaN(v) && v > 0) { livePrice = v; livePriceUnit = '$'; }
     update();
@@ -1038,10 +1067,11 @@ async function loadPreset(key) {
   badge.innerHTML = T[currentLang].fetchingLabel;
 
   try {
-    const { price, atrPct } = await preset.fetch();
-    livePrice     = price;
-    livePriceUnit = preset.priceUnit;
-    activePreset  = key;
+    const { price, atrPct, atrPctile } = await preset.fetch();
+    livePrice      = price;
+    livePriceUnit  = preset.priceUnit;
+    liveAtrPctile  = atrPctile;
+    activePreset   = key;
 
     const atrEl = document.getElementById('atr');
     atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
@@ -1054,7 +1084,8 @@ async function loadPreset(key) {
     update();
   } catch(e) {
     console.error('Preset fetch failed:', e);
-    livePrice = null;
+    livePrice     = null;
+    liveAtrPctile = null;
     badge.innerHTML = '';
     document.getElementById('btn-' + key).classList.remove('active');
     errEl.textContent   = T[currentLang].fetchErrorLabel + ' (' + e.message + ')';
@@ -1087,6 +1118,32 @@ update = function() {
     document.getElementById('row-live-price').style.display  = 'none';
     document.getElementById('row-stop-dollar').style.display = 'none';
   }
+
+  // ATR percentile display — only when live data provides it
+  const pctileRow = document.getElementById('row-atr-pctile');
+  if (liveAtrPctile !== null) {
+    const pctileEl = document.getElementById('atr-pctile');
+    const ordinal = liveAtrPctile + (currentLang === 'ko' ? '번째 백분위' : 'th percentile');
+    let regimeLabel, regimeColor;
+    if (liveAtrPctile >= 85) {
+      regimeLabel = currentLang === 'ko' ? ' — 매우 높은 변동성' : ' — very high volatility';
+      regimeColor = '#E24B4A';
+    } else if (liveAtrPctile >= 70) {
+      regimeLabel = currentLang === 'ko' ? ' — 높은 변동성' : ' — elevated volatility';
+      regimeColor = '#BA7517';
+    } else if (liveAtrPctile >= 30) {
+      regimeLabel = currentLang === 'ko' ? ' — 보통 변동성' : ' — normal volatility';
+      regimeColor = '#1D9E75';
+    } else {
+      regimeLabel = currentLang === 'ko' ? ' — 낮은 변동성' : ' — low volatility';
+      regimeColor = '#185FA5';
+    }
+    pctileEl.textContent = ordinal + regimeLabel;
+    pctileEl.style.color = regimeColor;
+    pctileRow.style.display = '';
+  } else {
+    pctileRow.style.display = 'none';
+  }
 };
 update();
 
@@ -1094,6 +1151,36 @@ update();
 
 let mcFanChart  = null;
 let mcHistChart = null;
+
+// Shared helper used by both Monte Carlo and sensitivity analysis
+function mcStats(wr, rr, rpt, stopDistOverride, fee, slip, tm, months, ruinThresh, nPaths) {
+  const rDenom      = stopDistOverride > 0 ? stopDistOverride : rpt;
+  const feeAsR      = rDenom > 0 ? (fee * 2) / rDenom : 0;
+  const slipAsR     = rDenom > 0 ? (slip * 0.10) / rDenom : 0;
+  const R           = rpt;
+  const netWinFrac  = Math.max((rr - feeAsR) * R / 100, 0);
+  const netLossFrac = Math.min((1 + feeAsR + slipAsR) * R / 100, 0.9999);
+  const finals = [];
+  let ruinCount = 0;
+  for (let p = 0; p < nPaths; p++) {
+    let equity = 100, peak = 100;
+    for (let m = 0; m < months; m++) {
+      for (let tr = 0; tr < tm; tr++) {
+        if (Math.random() < wr) equity *= (1 + netWinFrac);
+        else                    equity  = Math.max(equity * (1 - netLossFrac), 0.001);
+        if (equity > peak) peak = equity;
+      }
+    }
+    if ((peak - equity) / peak >= ruinThresh) ruinCount++;
+    finals.push(equity);
+  }
+  finals.sort((a, b) => a - b);
+  return {
+    medianReturn: (finals[Math.floor(0.50 * nPaths)] / 100 - 1) * 100,
+    ruinProb:     (ruinCount / nPaths) * 100,
+    p5Return:     (finals[Math.floor(0.05 * nPaths)] / 100 - 1) * 100,
+  };
+}
 
 document.getElementById('mc-months').addEventListener('input', () => {
   document.getElementById('mc-months-out').textContent = document.getElementById('mc-months').value;
@@ -1116,8 +1203,8 @@ function runMonteCarlo() {
   const slipAsR    = rDenom > 0 ? (slip * 0.10) / rDenom : 0;
   const totalCostR = feeAsR + slipAsR;
   const R          = rpt;
-  const netWinFrac  = (rr - feeAsR) * R / 100;
-  const netLossFrac = (1 + totalCostR) * R / 100;
+  const netWinFrac  = Math.max((rr - feeAsR) * R / 100, 0);
+  const netLossFrac = Math.min((1 + totalCostR) * R / 100, 0.9999);
 
   const N_PATHS = 1000;
   const N_FAN   = 50;
@@ -1193,13 +1280,33 @@ function runMonteCarlo() {
     { label: 'p5',  data: b_p5,  borderColor: '#E24B4A', borderWidth: 1.5, borderDash: [3,3], pointRadius: 0, fill: false }
   );
 
+  // Store band data at module scope so tooltip can access it
+  const _mcBands = { b_p5, b_p25, b_p50, b_p75, b_p95, portfolio };
+
   if (mcFanChart) mcFanChart.destroy();
   mcFanChart = new Chart(document.getElementById('mc-fan-chart'), {
     type: 'line',
     data: { labels, datasets: fanDatasets },
     options: {
       responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: ctx => ctx.datasetIndex >= N_FAN, // only show percentile bands, not individual paths
+          callbacks: {
+            title: items => (currentLang === 'ko' ? '월 ' : 'Month ') + items[0].label,
+            label: ctx => {
+              const v   = ctx.parsed.y;
+              const abs = '$' + Math.round(_mcBands.portfolio * v / 100).toLocaleString();
+              const lbl = ctx.dataset.label;
+              const ret = ((v / 100 - 1) * 100);
+              const sign = ret >= 0 ? '+' : '';
+              return `${lbl}:  ${v.toFixed(1)}  (${abs},  ${sign}${ret.toFixed(1)}%)`;
+            }
+          }
+        }
+      },
       scales: {
         x: { title: { display: true, text: currentLang === 'ko' ? '개월' : 'Months', font: { size: 11 }, color: '#888' } },
         y: { title: { display: true, text: currentLang === 'ko' ? '포트폴리오 (시작=100)' : 'Portfolio (start=100)', font: { size: 11 }, color: '#888' },
@@ -1243,121 +1350,211 @@ function runMonteCarlo() {
 
 // ── Sensitivity analysis ─────────────────────────────────────────────────────
 
-let saChart = null;
+const saSmCharts = {};
+let saHmChart = null;
 
 document.getElementById('sa-months').addEventListener('input', () => {
   document.getElementById('sa-months-out').textContent = document.getElementById('sa-months').value;
 });
 
-function mcStats(wr, rr, rpt, stopDistOverride, fee, slip, tm, months, ruinThresh, nPaths) {
-  const rDenom      = stopDistOverride > 0 ? stopDistOverride : rpt;
-  const feeAsR      = rDenom > 0 ? (fee * 2) / rDenom : 0;
-  const slipAsR     = rDenom > 0 ? (slip * 0.10) / rDenom : 0;
-  const R           = rpt;
-  const netWinFrac  = Math.max((rr - feeAsR) * R / 100, 0);
-  const netLossFrac = Math.min((1 + feeAsR + slipAsR) * R / 100, 0.9999);
-  const finals = [];
-  let ruinCount = 0;
-  for (let p = 0; p < nPaths; p++) {
-    let equity = 100, peak = 100;
-    for (let m = 0; m < months; m++) {
-      for (let tr = 0; tr < tm; tr++) {
-        if (Math.random() < wr) equity *= (1 + netWinFrac);
-        else                    equity  = Math.max(equity * (1 - netLossFrac), 0.001);
-        if (equity > peak) peak = equity;
-      }
-    }
-    if ((peak - equity) / peak >= ruinThresh) ruinCount++;
-    finals.push(equity);
+function redrawHeatmapIfReady() {
+  if (document.getElementById('sa-results').style.display !== 'none') {
+    runHeatmapOnly();
   }
-  finals.sort((a, b) => a - b);
-  return {
-    medianReturn: (finals[Math.floor(0.50 * nPaths)] / 100 - 1) * 100,
-    ruinProb:     (ruinCount / nPaths) * 100,
-    p5Return:     (finals[Math.floor(0.05 * nPaths)] / 100 - 1) * 100,
-  };
+}
+function onHmAxisChange(changedId, otherId) {
+  const changed = document.getElementById(changedId);
+  const other   = document.getElementById(otherId);
+  if (changed.value === other.value) {
+    // Swap: give the other dropdown the first non-conflicting option
+    const opts = [...other.options].map(o => o.value);
+    other.value = opts.find(v => v !== changed.value) || opts[0];
+  }
+  redrawHeatmapIfReady();
+}
+document.getElementById('sa-hm-x').addEventListener('change', () => onHmAxisChange('sa-hm-x', 'sa-hm-y'));
+document.getElementById('sa-hm-y').addEventListener('change', () => onHmAxisChange('sa-hm-y', 'sa-hm-x'));
+
+const SA_PARAMS = {
+  wr:   { min: 0.20, max: 0.70, steps: 20, fmt: v => (v*100).toFixed(0)+'%',  get: b => b.wr,  set: (b,v) => ({...b, wr:   v}) },
+  rr:   { min: 0.5,  max: 5.0,  steps: 20, fmt: v => v.toFixed(1)+'R',        get: b => b.rr,  set: (b,v) => ({...b, rr:   v}) },
+  rpt:  { min: 0.25, max: 5.0,  steps: 20, fmt: v => v.toFixed(2)+'%',        get: b => b.rpt, set: (b,v) => ({...b, rpt:  v}) },
+  mult: { min: 0.5,  max: 4.0,  steps: 20, fmt: v => v.toFixed(1)+'×',        get: (b,sd,cm) => cm, set: (b,v,atr) => ({...b, _mult: v, _sd: atr*v}) },
+};
+
+function sweepValues(key) {
+  const p = SA_PARAMS[key];
+  return Array.from({ length: p.steps }, (_, i) => p.min + (p.max - p.min) * i / (p.steps - 1));
+}
+
+function getMetric(stats, metric) {
+  if (metric === 'median') return stats.medianReturn;
+  if (metric === 'ruin')   return stats.ruinProb;
+  if (metric === 'p5')     return stats.p5Return;
 }
 
 function runSensitivity() {
+  const base     = getVals();
+  const months   = parseInt(document.getElementById('sa-months').value);
+  const ruin     = parseInt(document.getElementById('mc-ruin').value) / 100;
+  const metric   = document.getElementById('sa-metric').value;
+  const hmX      = document.getElementById('sa-hm-x').value;
+  const hmY      = document.getElementById('sa-hm-y').value;
+  const atrPct   = parseInt(document.getElementById('atr').value) / 10;
+  const curMult  = parseInt(document.getElementById('stopmult').value) / 10;
+  const baseSd   = atrPct * curMult;
+
+  function evalPoint(overrides) {
+    const wr_  = overrides.wr  ?? base.wr;
+    const rr_  = overrides.rr  ?? base.rr;
+    const rpt_ = overrides.rpt ?? base.rpt;
+    const sd_  = overrides._sd ?? baseSd;
+    return mcStats(wr_, rr_, rpt_, sd_, base.fee, base.slip, base.tm, months, ruin, 200);
+  }
+
+  document.getElementById('sa-results').style.display = 'block';
+
+  // ── Small multiples ──
+  const smKeys = ['wr', 'rr', 'rpt', 'mult'];
+  const metricLabel = {
+    median: currentLang==='ko'?'수익률 중앙값 %':'Median return %',
+    ruin:   currentLang==='ko'?'파산 확률 %':'Ruin prob %',
+    p5:     currentLang==='ko'?'하위 5% 수익률':'p5 return %',
+  }[metric];
+  const metricColor = metric === 'ruin' ? '#E24B4A' : '#185FA5';
+
+  smKeys.forEach(key => {
+    const xVals = sweepValues(key);
+    const yVals = xVals.map(x => {
+      const ov = key === 'mult' ? { _sd: atrPct * x } : { [key]: x };
+      return parseFloat(getMetric(evalPoint(ov), metric).toFixed(2));
+    });
+    const curVal = key === 'mult' ? curMult : (key === 'wr' ? base.wr : (key === 'rr' ? base.rr : base.rpt));
+    const curIdx = xVals.reduce((b, v, i) => Math.abs(v - curVal) < Math.abs(xVals[b] - curVal) ? i : b, 0);
+
+    if (saSmCharts[key]) saSmCharts[key].destroy();
+    saSmCharts[key] = new Chart(document.getElementById('sa-' + key + '-chart'), {
+      type: 'line',
+      data: {
+        labels: xVals.map(SA_PARAMS[key].fmt),
+        datasets: [
+          { data: yVals, borderColor: metricColor, borderWidth: 2, pointRadius: 2, fill: false },
+          { data: yVals.map((v, i) => i === curIdx ? v : null),
+            borderWidth: 0, pointRadius: yVals.map((_, i) => i === curIdx ? 6 : 0),
+            pointBackgroundColor: '#333', fill: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ctx.datasetIndex===0 ? metricLabel+': '+ctx.parsed.y.toFixed(1)+'%' : null }}},
+        scales: {
+          x: { ticks: { maxTicksLimit: 5, autoSkip: true, font: { size: 10 } } },
+          y: { ticks: { font: { size: 10 }, callback: v => v.toFixed(0)+'%' } }
+        }
+      }
+    });
+  });
+
+  // ── Heatmap ──
+  runHeatmapOnly();
+}
+
+function runHeatmapOnly() {
   const base    = getVals();
   const months  = parseInt(document.getElementById('sa-months').value);
   const ruin    = parseInt(document.getElementById('mc-ruin').value) / 100;
-  const param   = document.getElementById('sa-param').value;
+  const metric  = document.getElementById('sa-metric').value;
+  const hmX     = document.getElementById('sa-hm-x').value;
+  const hmY     = document.getElementById('sa-hm-y').value;
+  if (hmX === hmY) {
+    // Auto-fix: swap Y to first non-conflicting option
+    const yEl = document.getElementById('sa-hm-y');
+    const alt = [...yEl.options].map(o => o.value).find(v => v !== hmX);
+    if (alt) { yEl.value = alt; return runHeatmapOnly(); }
+  }
   const atrPct  = parseInt(document.getElementById('atr').value) / 10;
   const curMult = parseInt(document.getElementById('stopmult').value) / 10;
-  const stopDist = atrPct * curMult;
+  const baseSd  = atrPct * curMult;
 
-  const sweeps = {
-    wr:   { min: 0.20, max: 0.70, fmt: v => (v*100).toFixed(0)+'%',  label: currentLang==='ko'?'승률':'Win rate (%)',       current: base.wr },
-    rr:   { min: 0.5,  max: 5.0,  fmt: v => v.toFixed(1)+'R',        label: currentLang==='ko'?'손익비 (R)':'R:R ratio',    current: base.rr },
-    rpt:  { min: 0.25, max: 5.0,  fmt: v => v.toFixed(2)+'%',        label: currentLang==='ko'?'최대 손실 %':'Max loss %',  current: base.rpt },
-    mult: { min: 0.5,  max: 4.0,  fmt: v => v.toFixed(1)+'×',        label: currentLang==='ko'?'손절 배수':'Stop multiple', current: curMult },
-  };
-  const sw     = sweeps[param];
-  const N      = 20;
-  const xVals  = Array.from({ length: N }, (_, i) => sw.min + (sw.max - sw.min) * i / (N - 1));
-  const medians = [], ruinProbs = [], p5s = [];
-
-  for (const x of xVals) {
-    let wr_ = base.wr, rr_ = base.rr, rpt_ = base.rpt, sd_ = stopDist;
-    if (param === 'wr')   wr_  = x;
-    if (param === 'rr')   rr_  = x;
-    if (param === 'rpt')  rpt_ = x;
-    if (param === 'mult') sd_  = atrPct * x;
-    const s = mcStats(wr_, rr_, rpt_, sd_, base.fee, base.slip, base.tm, months, ruin, 200);
-    medians.push(parseFloat(s.medianReturn.toFixed(2)));
-    ruinProbs.push(parseFloat(s.ruinProb.toFixed(2)));
-    p5s.push(parseFloat(s.p5Return.toFixed(2)));
+  function evalPoint(overrides) {
+    return mcStats(
+      overrides.wr  ?? base.wr,
+      overrides.rr  ?? base.rr,
+      overrides.rpt ?? base.rpt,
+      overrides._sd ?? baseSd,
+      base.fee, base.slip, base.tm, months, ruin, 200
+    );
   }
 
-  const xLabels    = xVals.map(sw.fmt);
-  const curIdx     = xVals.reduce((best, v, i) =>
-    Math.abs(v - sw.current) < Math.abs(xVals[best] - sw.current) ? i : best, 0);
-  const curMarker  = medians.map((v, i) => i === curIdx ? v : null);
+  const xVals = sweepValues(hmX);
+  const yVals = sweepValues(hmY);
+  const N = xVals.length, M = yVals.length;
+  const grid = [];
+  let gMin = Infinity, gMax = -Infinity;
 
-  document.getElementById('sa-chart-label').textContent =
-    (currentLang === 'ko' ? '현재 값: ' : 'Current value: ') + sw.fmt(sw.current);
-  document.getElementById('sa-results').style.display = 'block';
+  for (let j = 0; j < M; j++) {
+    for (let i = 0; i < N; i++) {
+      const ov = {};
+      if (hmX === 'mult') ov._sd = atrPct * xVals[i]; else ov[hmX] = xVals[i];
+      if (hmY === 'mult') ov._sd = atrPct * yVals[j]; else ov[hmY] = yVals[j];
+      const v = parseFloat(getMetric(evalPoint(ov), metric).toFixed(2));
+      grid.push(v);
+      if (v < gMin) gMin = v;
+      if (v > gMax) gMax = v;
+    }
+  }
 
-  if (saChart) saChart.destroy();
-  saChart = new Chart(document.getElementById('sa-chart'), {
-    type: 'line',
-    data: {
-      labels: xLabels,
-      datasets: [
-        { label: currentLang==='ko'?'수익률 중앙값 %':'Median return %',
-          data: medians, borderColor: '#185FA5', borderWidth: 2, pointRadius: 2, fill: false, yAxisID: 'y' },
-        { label: currentLang==='ko'?'파산 확률 %':'Ruin prob %',
-          data: ruinProbs, borderColor: '#E24B4A', borderWidth: 2, pointRadius: 2, fill: false, yAxisID: 'y2' },
-        { label: currentLang==='ko'?'하위 5% 수익률':'p5 return %',
-          data: p5s, borderColor: '#BA7517', borderWidth: 1.5, borderDash: [4,4], pointRadius: 2, fill: false, yAxisID: 'y' },
-        { label: currentLang==='ko'?'현재 값':'Current value',
-          data: curMarker, borderWidth: 0,
-          pointRadius: medians.map((_, i) => i === curIdx ? 8 : 0),
-          pointBackgroundColor: '#333', pointBorderColor: '#333', fill: false, yAxisID: 'y' },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: { duration: 200 },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: true, labels: { font: { size: 11 }, boxWidth: 14, padding: 10,
-          filter: item => item.datasetIndex < 3 } },
-        tooltip: { callbacks: {
-          label: ctx => ctx.datasetIndex === 3 ? null : ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
-        }}
-      },
-      scales: {
-        x:  { title: { display: true, text: sw.label, font: { size: 11 }, color: '#888' },
-              ticks: { maxTicksLimit: 10, autoSkip: true } },
-        y:  { position: 'left',
-              title: { display: true, text: currentLang==='ko'?'수익률 %':'Return %', font: { size: 11 }, color: '#888' } },
-        y2: { position: 'right',
-              title: { display: true, text: currentLang==='ko'?'파산 확률 %':'Ruin prob %', font: { size: 11 }, color: '#888' },
-              grid: { drawOnChartArea: false } }
+  const hmCanvas = document.getElementById('sa-hm-chart');
+  const cellW = Math.floor(hmCanvas.parentElement.offsetWidth / N);
+  const cellH = 22;
+  hmCanvas.width  = cellW * N;
+  hmCanvas.height = cellH * M;
+  hmCanvas.style.width  = cellW * N + 'px';
+  hmCanvas.style.height = cellH * M + 'px';
+  const ctx2 = hmCanvas.getContext('2d');
+
+  function cellColor(v) {
+    let t = gMax === gMin ? 0.5 : (v - gMin) / (gMax - gMin);
+    if (metric === 'ruin') t = 1 - t;
+    const r = t < 0.5 ? 220 : Math.round(220 - (t - 0.5) * 2 * 150);
+    const g = t < 0.5 ? Math.round(t * 2 * 180) : 180;
+    return `rgb(${r},${g},60)`;
+  }
+
+  // Find current parameter values for highlight
+  const curXVal = hmX === 'mult' ? curMult : (hmX === 'wr' ? base.wr : (hmX === 'rr' ? base.rr : base.rpt));
+  const curYVal = hmY === 'mult' ? curMult : (hmY === 'wr' ? base.wr : (hmY === 'rr' ? base.rr : base.rpt));
+  const curXIdx = xVals.reduce((b, v, i) => Math.abs(v - curXVal) < Math.abs(xVals[b] - curXVal) ? i : b, 0);
+  const curYIdx = yVals.reduce((b, v, i) => Math.abs(v - curYVal) < Math.abs(yVals[b] - curYVal) ? i : b, 0);
+
+  ctx2.font = '9px sans-serif';
+  ctx2.textAlign = 'center';
+  ctx2.textBaseline = 'middle';
+
+  for (let j = 0; j < M; j++) {
+    for (let i = 0; i < N; i++) {
+      const v = grid[j * N + i];
+      const x = i * cellW, y = j * cellH;
+      ctx2.fillStyle = cellColor(v);
+      ctx2.fillRect(x, y, cellW, cellH);
+      ctx2.fillStyle = '#fff';
+      ctx2.fillText(v.toFixed(1), x + cellW / 2, y + cellH / 2);
+
+      // Highlight current parameter cell with white border
+      if (i === curXIdx && j === curYIdx) {
+        ctx2.strokeStyle = '#fff';
+        ctx2.lineWidth = 2.5;
+        ctx2.strokeRect(x + 1.5, y + 1.5, cellW - 3, cellH - 3);
+        ctx2.strokeStyle = '#000';
+        ctx2.lineWidth = 1;
+        ctx2.strokeRect(x + 0.5, y + 0.5, cellW - 1, cellH - 1);
       }
     }
-  });
+  }
+
+  document.getElementById('sa-hm-min').textContent = SA_PARAMS[hmX].fmt(xVals[0]) + ' → ' + SA_PARAMS[hmX].fmt(xVals[N-1]);
+  document.getElementById('sa-hm-max').textContent = SA_PARAMS[hmY].fmt(yVals[0]) + ' ↓ ' + SA_PARAMS[hmY].fmt(yVals[M-1]);
 }</script>
 </body>
 </html>
