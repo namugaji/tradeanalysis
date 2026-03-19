@@ -69,7 +69,7 @@
     .preset-btn.unstable { border-color: #c0392b; color: #c0392b; }
     .preset-btn.unstable:hover { background: #fdf0ee; }
     .preset-btn.unstable.active { border-color: #c0392b; color: #c0392b; background: #fdf0ee; }
-    .unstable-note { font-size: 10px; color: #c0392b; margin-top: 5px; }
+    .unstable-note { font-size: 10px; color: #c0392b; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -80,6 +80,7 @@
 
   <div class="section">
     <div class="section-title" data-i18n="presetsLabel"></div>
+    <div class="unstable-note" data-i18n="unstableNote"></div>
     <div class="preset-bar">
       <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')">Custom</button>
       <button class="preset-btn" id="btn-btc"  onclick="loadPreset('btc')">BTC Perp</button>
@@ -89,7 +90,6 @@
       <button class="preset-btn unstable" id="btn-nq" onclick="loadPreset('nq')">NQ Futures</button>
       <div class="live-badge" id="live-badge"></div>
     </div>
-    <div class="unstable-note" data-i18n="unstableNote"></div>
     <div class="custom-price-row" id="custom-price-row">
       <label data-i18n="customPriceLabel"></label>
       <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" oninput="onCustomPrice()">
@@ -866,25 +866,44 @@ async function fetchYahoo(ticker) {
 }
 
 async function fetchStooq(ticker) {
-  // Stooq returns CSV: Date,Open,High,Low,Close,Volume
-  // Fetch ~90 days for ATR warmup
-  const url  = `https://stooq.com/q/d/l/?s=${ticker}&i=d`;
+  // For ETFs, try Yahoo Finance first (reliable for non-futures), then Stooq as fallback
+  const yahooTicker = ticker.toUpperCase();
+  const yahooUrls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=3mo`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=3mo`,
+  ];
+  for (const url of yahooUrls) {
+    for (const fetcher of [u => timedFetch(u, 10000), u => viaAllorigins(u)]) {
+      try {
+        const data = await fetcher(url);
+        const q      = data.chart.result[0];
+        const highs  = q.indicators.quote[0].high;
+        const lows   = q.indicators.quote[0].low;
+        const closes = q.indicators.quote[0].close;
+        return parseOHLCV(
+          highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
+          r => r
+        );
+      } catch { /* try next */ }
+    }
+  }
+  // Stooq CSV fallback
+  const stooqUrl = `https://stooq.com/q/d/l/?s=${ticker}&i=d`;
   let text;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    if (!res.ok) throw new Error(`Stooq HTTP ${res.status}`);
+    const res = await fetch(stooqUrl, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error();
     text = await res.text();
   } catch {
-    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://stooq.com/q/d/l/?s=' + ticker + '&i=d')}`;
-    const res   = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) throw new Error('Stooq via proxy failed');
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(stooqUrl)}`, { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error('All sources failed for ' + ticker);
     text = await res.text();
   }
-  const lines = text.trim().split('\n').slice(1); // skip header
+  const lines = text.trim().split('\n').slice(1);
   const rows  = lines.map(l => {
     const p = l.split(',');
     return { high: parseFloat(p[2]), low: parseFloat(p[3]), close: parseFloat(p[4]) };
-  }).filter(r => !isNaN(r.close)).slice(-90); // last 90 candles
+  }).filter(r => !isNaN(r.close)).slice(-90);
   return parseOHLCV(rows, r => r);
 }
 
