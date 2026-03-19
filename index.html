@@ -692,14 +692,25 @@ function parseOHLCV(rows, mapper) {
   const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
   if (candles.length < 2) throw new Error('Not enough candle data');
   const price = candles[candles.length - 1].close;
+
+  // Compute True Range for each candle
   const trs = [];
   for (let i = 1; i < candles.length; i++) {
     const { high, low } = candles[i];
     const prev = candles[i - 1].close;
     trs.push(Math.max(high - low, Math.abs(high - prev), Math.abs(prev - low)));
   }
-  const atr14 = trs.slice(-14).reduce((a, b) => a + b, 0) / Math.min(trs.length, 14);
-  return { price, atrPct: (atr14 / price) * 100 };
+
+  // Wilder's smoothed ATR (RMA): seed with SMA of first 14 TRs, then smooth
+  // This matches TradingView and most charting platforms
+  const n = 14;
+  if (trs.length < n) throw new Error('Not enough data for ATR-14');
+  let atr = trs.slice(0, n).reduce((a, b) => a + b, 0) / n;
+  for (let i = n; i < trs.length; i++) {
+    atr = (atr * (n - 1) + trs[i]) / n;
+  }
+
+  return { price, atrPct: (atr / price) * 100 };
 }
 
 async function timedFetch(url, ms = 8000) {
@@ -728,7 +739,7 @@ const PRESETS = {
     async fetch() {
       // Kraken public REST — genuinely CORS-friendly, no proxy needed
       // interval 1440 = daily candles
-      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440');
+      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*62));
       if (data.error && data.error.length) throw new Error(data.error[0]);
       const rows = data.result['XXBTZUSD'] || data.result[Object.keys(data.result)[0]];
       // Kraken OHLC: [time, open, high, low, close, vwap, volume, count]
@@ -751,9 +762,9 @@ const PRESETS = {
 
 async function fetchYahoo(ticker) {
   const urls = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`,
-    `https://query1.finance.yahoo.com/v7/finance/chart/${ticker}?interval=1d&range=30d`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`,
+    `https://query1.finance.yahoo.com/v7/finance/chart/${ticker}?interval=1d&range=3mo`,
   ];
   let lastErr;
   for (const url of urls) {
