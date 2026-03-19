@@ -126,12 +126,12 @@
     <div class="section-title"><span data-i18n="strategyParams"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_params"></span></span></div>
     <div class="controls">
       <div class="control-row">
-        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">40%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_wr"></span></span></label>
-        <input type="range" id="wr" min="0" max="100" step="1" value="40">
+        <label><span data-i18n="winRate"></span>: <span class="val" id="wr-out">42.3%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_wr"></span></span></label>
+        <input type="range" id="wr" min="0" max="100" step="0.1" value="42.3">
       </div>
       <div class="control-row">
-        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">2.00R</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rr"></span></span></label>
-        <input type="range" id="rr" min="0" max="10" step="0.01" value="2.0">
+        <label><span data-i18n="rrRatio"></span>: <span class="val" id="rr-out">1.50R</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_rr"></span></span></label>
+        <input type="range" id="rr" min="0" max="10" step="0.01" value="1.5">
       </div>
       <div class="control-row">
         <label><span data-i18n="tradesPerMonth"></span>: <span class="val" id="tm-out">20</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_tm"></span></span></label>
@@ -150,8 +150,8 @@
         <input type="range" id="stopmult" min="5" max="50" step="1" value="15">
       </div>
       <div class="control-row">
-        <label><span data-i18n="feePerTx"></span>: <span class="val" id="fee-out">0.08%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_fee"></span></span></label>
-        <input type="range" id="fee" min="0" max="200" step="1" value="8">
+        <label><span data-i18n="feePerTx"></span>: <span class="val" id="fee-out">0.00%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_fee"></span></span></label>
+        <input type="range" id="fee" min="0" max="200" step="1" value="0">
       </div>
       <div class="control-row">
         <label><span data-i18n="slippageLabel"></span>: <span class="val" id="slip-out">0.00%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_slip"></span></span></label>
@@ -233,8 +233,8 @@
     <div class="section-title"><span data-i18n="mcTitle"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_mc"></span></span></div>
     <div class="controls" style="margin-bottom:1rem;">
       <div class="control-row">
-        <label><span data-i18n="mcMonths"></span>: <span class="val" id="mc-months-out">6</span></label>
-        <input type="range" id="mc-months" min="1" max="36" step="1" value="6">
+        <label><span data-i18n="mcMonths"></span>: <span class="val" id="mc-months-out">12</span></label>
+        <input type="range" id="mc-months" min="1" max="36" step="1" value="12">
       </div>
       <div class="control-row">
         <label><span data-i18n="mcRuin"></span>: <span class="val" id="mc-ruin-out">20%</span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_mcRuin"></span></span></label>
@@ -281,8 +281,8 @@
     <p style="font-size:13px;color:#555;margin:0 0 1rem;" data-i18n="saDesc"></p>
     <div class="controls" style="margin-bottom:1rem;">
       <div class="control-row">
-        <label><span data-i18n="saMonths"></span>: <span class="val" id="sa-months-out">6</span></label>
-        <input type="range" id="sa-months" min="1" max="36" step="1" value="6">
+        <label><span data-i18n="saMonths"></span>: <span class="val" id="sa-months-out">12</span></label>
+        <input type="range" id="sa-months" min="1" max="36" step="1" value="12">
       </div>
       <div class="control-row">
         <label><span data-i18n="saMetric"></span></label>
@@ -684,7 +684,7 @@ function formatPortfolioInput() {
 
 function getVals() {
   return {
-    wr:        parseInt(document.getElementById('wr').value) / 100,
+    wr:        parseFloat(document.getElementById('wr').value) / 100,
     rr:        parseFloat(document.getElementById('rr').value),
     tm:        parseInt(document.getElementById('tm').value),
     rpt:       parseInt(document.getElementById('rpt').value) / 10,
@@ -721,7 +721,7 @@ function update() {
   const posSizePct = stopDist > 0 ? (rpt * 100) / stopDist : 0;
   const posSizeUsd = portfolio * posSizePct / 100;
 
-  document.getElementById('wr-out').textContent   = (wr * 100).toFixed(0) + '%';
+  document.getElementById('wr-out').textContent   = (wr * 100).toFixed(1) + '%';
   document.getElementById('rr-out').textContent   = rr.toFixed(2) + 'R';
   document.getElementById('tm-out').textContent   = tm;
   document.getElementById('rpt-out').textContent  = rpt.toFixed(1) + '%';
@@ -763,7 +763,7 @@ function update() {
   evNetEl.style.color = netEV > 0 ? '#1D9E75' : '#E24B4A';
 
   document.getElementById('be-wr').textContent = beWR !== null
-    ? (beWR * 100).toFixed(1) + '% (' + t('yours') + ': ' + (wr * 100).toFixed(0) + '%)'
+    ? (beWR * 100).toFixed(1) + '% (' + t('yours') + ': ' + (wr * 100).toFixed(1) + '%)'
     : t('naRatio');
 
   const edgeEl  = document.getElementById('edge');
@@ -1376,7 +1376,7 @@ document.getElementById('sa-hm-x').addEventListener('change', () => onHmAxisChan
 document.getElementById('sa-hm-y').addEventListener('change', () => onHmAxisChange('sa-hm-y', 'sa-hm-x'));
 
 const SA_PARAMS = {
-  wr:   { min: 0.20, max: 0.70, steps: 20, fmt: v => (v*100).toFixed(0)+'%',  get: b => b.wr,  set: (b,v) => ({...b, wr:   v}) },
+  wr:   { min: 0.20, max: 0.70, steps: 20, fmt: v => (v*100).toFixed(1)+'%',  get: b => b.wr,  set: (b,v) => ({...b, wr:   v}) },
   rr:   { min: 0.5,  max: 5.0,  steps: 20, fmt: v => v.toFixed(1)+'R',        get: b => b.rr,  set: (b,v) => ({...b, rr:   v}) },
   rpt:  { min: 0.25, max: 5.0,  steps: 20, fmt: v => v.toFixed(2)+'%',        get: b => b.rpt, set: (b,v) => ({...b, rpt:  v}) },
   mult: { min: 0.5,  max: 4.0,  steps: 20, fmt: v => v.toFixed(1)+'×',        get: (b,sd,cm) => cm, set: (b,v,atr) => ({...b, _mult: v, _sd: atr*v}) },
