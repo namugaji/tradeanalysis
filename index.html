@@ -66,7 +66,7 @@
   <div style="display:flex; justify-content:flex-end; margin-bottom:1rem;">
     <button class="lang-btn" id="lang-btn" onclick="toggleLang()">English</button>
   </div>
- 
+
   <div class="section">
     <div class="section-title" data-i18n="presetsLabel"></div>
     <div class="preset-bar">
@@ -77,9 +77,9 @@
     </div>
     <div class="live-error" id="live-error"></div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="portfolioLabel"></div>
     <div class="portfolio-row">
@@ -88,9 +88,9 @@
     </div>
     <div class="error-msg" id="portfolio-error"></div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="strategyParams"></div>
     <div class="controls">
@@ -128,9 +128,9 @@
       </div>
     </div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="sizingTitle"></div>
     <div class="ev-row" id="row-live-price" style="display:none;"><span class="ev-label" data-i18n="livePriceLabel"></span><span id="live-price-display"></span></div>
@@ -140,9 +140,9 @@
     <div class="ev-row" style="border-bottom:none;"><span class="ev-label" data-i18n="noiseRiskLabel"></span><span id="noise-risk" style="font-weight:500;"></span></div>
     <div style="font-size:11px;color:#888;margin-top:10px;font-style:italic;" data-i18n="atrDisclaimer"></div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="feeBreakdown"></div>
     <div class="ev-row"><span class="ev-label" data-i18n="totalFeeLabel"></span><span id="fee-total"></span></div>
@@ -150,9 +150,9 @@
     <div class="ev-row"><span class="ev-label" data-i18n="totalCostLabel"></span><span id="total-cost" style="font-weight:500;"></span></div>
     <div class="ev-row"><span class="ev-label" data-i18n="feeAsR"></span><span id="fee-r"></span></div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="evTitle"></div>
     <div class="ev-row"><span class="ev-label" data-i18n="grossEV"></span><span id="ev-gross"></span></div>
@@ -160,9 +160,9 @@
     <div class="ev-row"><span class="ev-label" data-i18n="breakEvenWR"></span><span id="be-wr"></span></div>
     <div class="ev-row"><span class="ev-label" data-i18n="edgeLabel"></span><span id="edge"></span></div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="monthlyTitle"></div>
     <div class="metric-grid">
@@ -184,9 +184,9 @@
       </div>
     </div>
   </div>
- 
+
   <hr class="divider">
- 
+
   <div class="section">
     <div class="section-title" data-i18n="chartTitle"></div>
     <div class="controls" style="margin-bottom:0.75rem;">
@@ -208,15 +208,15 @@
     </div>
     <div class="chart-wrap"><canvas id="eqChart"></canvas></div>
   </div>
- 
+
   <div id="verdict-box" class="alert-box" style="margin-top:1rem;"></div>
 </div>
- 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 let eqChart = null;
 let currentLang = 'ko';
- 
+
 const T = {
   ko: {
     currencySymbol: '₩',
@@ -373,11 +373,11 @@ const T = {
     langToggleBtn: '한국어',
   }
 };
- 
+
 function t(key) { return T[currentLang][key]; }
 function fmt(n) { return t('currencySymbol') + Math.round(Math.abs(n)).toLocaleString(); }
 function fmtSigned(n) { return (n >= 0 ? '+' : '-') + fmt(n); }
- 
+
 function applyStaticText() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -387,18 +387,18 @@ function applyStaticText() {
   document.getElementById('portfolio-error').textContent = t('portfolioError');
   document.getElementById('lang-btn').textContent = t('langToggleBtn');
 }
- 
+
 function toggleLang() {
   currentLang = currentLang === 'ko' ? 'en' : 'ko';
   applyStaticText();
   update();
 }
- 
+
 function getPortfolio() {
   const v = parseFloat(document.getElementById('portfolio').value);
   return (isNaN(v) || v < 0) ? null : v;
 }
- 
+
 function getVals() {
   return {
     wr:        parseInt(document.getElementById('wr').value) / 100,
@@ -411,17 +411,17 @@ function getVals() {
     portfolio: getPortfolio()
   };
 }
- 
+
 function calcPTF(wr, netWinFrac, netLossFrac) {
   const safeL = Math.max(1 - netLossFrac, 0.000001);
   if (wr <= 0) return safeL;
   if (wr >= 1) return 1 + netWinFrac;
   return Math.pow(1 + netWinFrac, wr) * Math.pow(safeL, 1 - wr);
 }
- 
+
 function update() {
   const { wr, rr, tm, rpt, fee, slip, chartDays, portfolio } = getVals();
- 
+
   const errEl     = document.getElementById('portfolio-error');
   const portInput = document.getElementById('portfolio');
   if (portfolio === null) {
@@ -431,14 +431,14 @@ function update() {
   }
   portInput.classList.remove('input-error');
   errEl.style.display = 'none';
- 
+
   // ATR sizing — computed early so cost section can use stopDist
   const atrPct   = parseInt(document.getElementById('atr').value) / 10;
   const stopMult = parseInt(document.getElementById('stopmult').value) / 10;
   const stopDist = atrPct * stopMult;
   const posSizePct = stopDist > 0 ? (rpt * 100) / stopDist : 0;
   const posSizeUsd = portfolio * posSizePct / 100;
- 
+
   document.getElementById('wr-out').textContent   = (wr * 100).toFixed(0) + '%';
   document.getElementById('rr-out').textContent   = rr.toFixed(2) + 'R';
   document.getElementById('tm-out').textContent   = tm;
@@ -446,7 +446,7 @@ function update() {
   document.getElementById('fee-out').textContent  = fee.toFixed(2) + '%';
   document.getElementById('slip-out').textContent = slip.toFixed(2) + '%';
   document.getElementById('days-out').textContent = chartDays;
- 
+
   // Use stopDist as R denominator when ATR is set; fall back to rpt (assumes 100% position)
   const SLIP_FREQ  = 0.10;
   const totalFee   = fee * 2;
@@ -456,11 +456,11 @@ function update() {
   const totalCostR = feeAsR + slipAsR;
   const R          = rpt;
   const riskPerTrade = portfolio * R / 100;
- 
+
   const feeStr = (pct) => currentLang === 'ko'
     ? t('ofPosition') + ' ' + pct.toFixed(2) + '%'
     : pct.toFixed(2) + '% ' + t('ofPosition');
- 
+
   document.getElementById('fee-total').textContent  = feeStr(totalFee);
   document.getElementById('slip-cost').textContent  = feeStr(slip) + '  ×10% = ' + feeStr(slip * SLIP_FREQ);
   document.getElementById('total-cost').textContent = feeStr(totalFee + slip * SLIP_FREQ);
@@ -468,62 +468,62 @@ function update() {
     ? (totalCostR * 100).toFixed(1) + '% of 1R (' + totalCostR.toFixed(3) + 'R)'
       + (stopDist > 0 ? '' : ' *')
     : t('naFee');
- 
+
   // netWin: fees reduce wins on both sides; slippage only on losses
   const netWin  = rr - feeAsR;
   const netLoss = 1 + totalCostR;
   const grossEV = wr * rr - (1 - wr);
   const netEV   = wr * netWin - (1 - wr) * netLoss;
   const beWR    = rr > 0 ? (1 + totalCostR) / (rr + 1) : null;
- 
+
   document.getElementById('ev-gross').textContent = grossEV.toFixed(3) + 'R (' + (grossEV * R).toFixed(2) + '%)  ' + fmt(grossEV * riskPerTrade);
   const evNetEl = document.getElementById('ev-net');
   evNetEl.textContent = netEV.toFixed(3) + 'R (' + (netEV * R).toFixed(2) + '%)  ' + fmt(netEV * riskPerTrade);
   evNetEl.style.color = netEV > 0 ? '#1D9E75' : '#E24B4A';
- 
+
   document.getElementById('be-wr').textContent = beWR !== null
     ? (beWR * 100).toFixed(1) + '% (' + t('yours') + ': ' + (wr * 100).toFixed(0) + '%)'
     : t('naRatio');
- 
+
   const edgeEl  = document.getElementById('edge');
   const edgeVal = beWR !== null ? wr - beWR : 0;
   edgeEl.textContent = beWR !== null ? (edgeVal * 100).toFixed(1) + t('ppUnit') : 'n/a';
   edgeEl.style.color = edgeVal > 0.05 ? '#1D9E75' : edgeVal > 0 ? '#BA7517' : '#E24B4A';
- 
+
   const netWinFrac  = netWin  * R / 100;
   const netLossFrac = netLoss * R / 100;
   const ptf = calcPTF(wr, netWinFrac, netLossFrac);
   const monthlyFactor    = Math.pow(ptf, tm);
   const monthlyReturn    = (monthlyFactor - 1) * 100;
   const monthlyReturnUsd = portfolio * (monthlyFactor - 1);
- 
+
   // fee drag: compare with-cost vs no-cost
   const ptfNoFee   = calcPTF(wr, rr * R / 100, R / 100);
   const feeDragPct = (Math.pow(ptfNoFee, tm) - monthlyFactor) * 100;
   const feeDragUsd = portfolio * (Math.pow(ptfNoFee, tm) - monthlyFactor);
- 
+
   const mrEl = document.getElementById('monthly-return');
   mrEl.textContent = (monthlyReturn >= 0 ? '+' : '') + monthlyReturn.toFixed(2) + '%';
   mrEl.className   = 'metric-value ' + (monthlyReturn >= 0 ? 'positive' : 'negative');
   document.getElementById('monthly-return-usd').textContent = fmtSigned(monthlyReturnUsd);
   document.getElementById('monthly-fees').textContent     = '-' + feeDragPct.toFixed(2) + '%';
   document.getElementById('monthly-fees-usd').textContent = '-' + fmt(feeDragUsd);
- 
+
   const lossRate = 1 - wr;
   let maxLoss;
   if (lossRate <= 0)      maxLoss = 0;
   else if (lossRate >= 1) maxLoss = 99999;
   else                    maxLoss = Math.ceil(Math.log(0.01) / Math.log(lossRate));
- 
+
   const drawdownFactor = Math.pow(Math.max(1 - netLossFrac, 0.000001), maxLoss);
   const drawdownPct    = (1 - drawdownFactor) * 100;
   const drawdownUsd    = portfolio * (1 - drawdownFactor);
- 
+
   document.getElementById('max-losses').textContent     = maxLoss < 99999 ? maxLoss + ' ' + t('inARow') : t('infiniteLosses');
   document.getElementById('max-losses-usd').textContent = maxLoss > 0 && maxLoss < 99999 ? fmt(drawdownUsd) + ' ' + t('drawdown') : '';
   document.getElementById('max-losses-pct').textContent = maxLoss > 0 && maxLoss < 99999 && drawdownPct > 0
     ? drawdownPct.toFixed(1) + '% ' + t('ofPortfolio') : '';
- 
+
   // ATR pre-trade sizing display
   document.getElementById('atr-out').textContent    = atrPct.toFixed(1) + '%';
   document.getElementById('mult-out').textContent   = stopMult.toFixed(1) + '×';
@@ -533,9 +533,9 @@ function update() {
   const noiseEl  = document.getElementById('noise-risk');
   noiseEl.textContent = riskInfo.label;
   noiseEl.style.color = riskInfo.color;
- 
+
   buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFrac, portfolio);
- 
+
   const verdict = document.getElementById('verdict-box');
   const edgeStr = (edgeVal * 100).toFixed(1);
   if (netEV <= 0) {
@@ -549,16 +549,16 @@ function update() {
     verdict.textContent = t('positiveAlert')(edgeStr);
   }
 }
- 
+
 function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFrac, portfolio) {
   const tradesPerDay = tm / 30;
   const numTrades    = Math.max(1, Math.round(chartDays * tradesPerDay));
   const cappedTrades = Math.min(numTrades, 5000);
- 
+
   const a    = Math.log(1 + netWinFrac);
   const b    = Math.log(Math.max(1 - netLossFrac, 0.000001));
   const diff = Math.abs(a - b);
- 
+
   const infoEl = document.getElementById('trades-in-window');
   if (tm === 0) {
     infoEl.textContent = t('zeroTrades');
@@ -567,11 +567,11 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
   } else {
     infoEl.textContent = tradesPerDay.toFixed(1) + ' ' + t('tradesPerDay') + ' — ' + cappedTrades + ' ' + t('tradesShown');
   }
- 
+
   const step = Math.max(1, Math.floor(cappedTrades / 300));
   const medSeries = [100], s1up = [100], s1lo = [100], s2up = [100], s2lo = [100], labels = ['0'];
   let med = 100;
- 
+
   for (let i = 1; i <= cappedTrades; i++) {
     med *= ptf;
     if (i % step === 0 || i === cappedTrades) {
@@ -585,9 +585,9 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
       s2lo.push(parseFloat(Math.max(med * Math.exp(-2 * sigma), 0.000001).toFixed(6)));
     }
   }
- 
+
   const curr = t('currencySymbol');
- 
+
   if (eqChart) eqChart.destroy();
   eqChart = new Chart(document.getElementById('eqChart'), {
     type: 'line',
@@ -637,43 +637,59 @@ function buildChart(wr, rr, R, feeAsR, tm, chartDays, ptf, netWinFrac, netLossFr
     }
   });
 }
- 
+
 applyStaticText();
 document.getElementById('portfolio').addEventListener('input', update);
 ['wr','rr','tm','rpt','fee','slippage','chartdays','atr','stopmult'].forEach(id => {
   document.getElementById(id).addEventListener('input', update);
 });
 update();
- 
+
 // ── Live data / presets ──────────────────────────────────────────────────────
- 
+
 let livePrice = null;
 let activePreset = null;
- 
-const PROXY = 'https://corsproxy.io/?url=';
- 
+
+function parseOHLCV(rows, mapper) {
+  const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
+  if (candles.length < 2) throw new Error('Not enough candle data');
+  const price = candles[candles.length - 1].close;
+  const trs = [];
+  for (let i = 1; i < candles.length; i++) {
+    const { high, low } = candles[i];
+    const prev = candles[i - 1].close;
+    trs.push(Math.max(high - low, Math.abs(high - prev), Math.abs(prev - low)));
+  }
+  const atr14 = trs.slice(-14).reduce((a, b) => a + b, 0) / Math.min(trs.length, 14);
+  return { price, atrPct: (atr14 / price) * 100 };
+}
+
+async function timedFetch(url, ms = 8000) {
+  const res = await fetch(url, { signal: AbortSignal.timeout(ms) });
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+  return res.json();
+}
+
+// Fetch via allorigins /raw (returns body directly, no wrapper)
+async function viaAllorigins(url) {
+  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+  const res   = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error(`allorigins HTTP ${res.status}`);
+  return res.json();
+}
+
 const PRESETS = {
   btc: {
     label: 'BTC Perp',
     feeDefault: 8,
     async fetch() {
-      // Try Binance spot first, fall back to CoinGecko
-      try {
-        const url = PROXY + encodeURIComponent('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=16');
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Binance failed');
-        const data = await res.json();
-        return parseOHLCV(data, i => ({
-          high: parseFloat(i[2]), low: parseFloat(i[3]), close: parseFloat(i[4])
-        }));
-      } catch {
-        // CoinGecko fallback — returns [[timestamp, open, high, low, close], ...]
-        const url = PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=14');
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('CoinGecko failed');
-        const data = await res.json();
-        return parseOHLCV(data, i => ({ high: i[2], low: i[3], close: i[4] }));
-      }
+      // Kraken public REST — genuinely CORS-friendly, no proxy needed
+      // interval 1440 = daily candles
+      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440');
+      if (data.error && data.error.length) throw new Error(data.error[0]);
+      const rows = data.result['XXBTZUSD'] || data.result[Object.keys(data.result)[0]];
+      // Kraken OHLC: [time, open, high, low, close, vwap, volume, count]
+      return parseOHLCV(rows, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
     }
   },
   es: {
@@ -687,42 +703,33 @@ const PRESETS = {
     async fetch() { return fetchYahoo('NQ=F'); }
   }
 };
- 
-function parseOHLCV(rows, mapper) {
-  const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
-  if (candles.length < 2) throw new Error('Not enough candle data');
-  const price = candles[candles.length - 1].close;
-  const trs = [];
-  for (let i = 1; i < candles.length; i++) {
-    const { high, low } = candles[i];
-    const prevClose = candles[i - 1].close;
-    trs.push(Math.max(high - low, Math.abs(high - prevClose), Math.abs(prevClose - low)));
-  }
-  const atr14  = trs.slice(-14).reduce((a, b) => a + b, 0) / Math.min(trs.length, 14);
-  const atrPct = (atr14 / price) * 100;
-  return { price, atrPct };
-}
- 
+
 async function fetchYahoo(ticker) {
-  const url = PROXY + encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`);
-  const res  = await fetch(url);
-  if (!res.ok) throw new Error('Yahoo Finance error');
-  const json = await res.json();
-  const q      = json.chart.result[0];
+  const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`;
+  let data;
+  try {
+    // Try direct first (works in some environments)
+    data = await timedFetch(url);
+  } catch {
+    // Fall back to allorigins proxy
+    data = await viaAllorigins(url);
+  }
+  const q      = data.chart.result[0];
   const highs  = q.indicators.quote[0].high;
   const lows   = q.indicators.quote[0].low;
   const closes = q.indicators.quote[0].close;
-  const rows   = highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] }))
-                      .filter(r => r.high != null);
-  return parseOHLCV(rows, r => r);
+  return parseOHLCV(
+    highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
+    r => r
+  );
 }
- 
+
 async function loadPreset(key) {
   const preset = PRESETS[key];
   const btn    = document.getElementById('btn-' + key);
   const badge  = document.getElementById('live-badge');
   const errEl  = document.getElementById('live-error');
- 
+
   ['btc','es','nq'].forEach(k => {
     document.getElementById('btn-' + k).classList.remove('active');
     document.getElementById('btn-' + k).disabled = false;
@@ -731,34 +738,32 @@ async function loadPreset(key) {
   btn.disabled = true;
   badge.innerHTML = T[currentLang].fetchingLabel;
   errEl.style.display = 'none';
- 
+
   try {
     const { price, atrPct } = await preset.fetch();
     livePrice    = price;
     activePreset = key;
- 
-    const atrInt = Math.round(atrPct * 10);
-    const atrEl  = document.getElementById('atr');
-    atrEl.value  = Math.min(Math.max(atrInt, parseInt(atrEl.min)), parseInt(atrEl.max));
+
+    const atrEl = document.getElementById('atr');
+    atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
     document.getElementById('fee').value = preset.feeDefault;
- 
-    const curr     = t('currencySymbol');
-    const priceStr = curr + Math.round(price).toLocaleString();
+
+    const priceStr = t('currencySymbol') + Math.round(price).toLocaleString();
     badge.innerHTML = T[currentLang].liveDataNote(preset.label, priceStr);
- 
     update();
-  } catch (e) {
+  } catch(e) {
+    console.error('Preset fetch failed:', e);
     livePrice = null;
     badge.innerHTML = '';
     btn.classList.remove('active');
-    errEl.textContent   = T[currentLang].fetchErrorLabel;
+    errEl.textContent   = T[currentLang].fetchErrorLabel + ' (' + e.message + ')';
     errEl.style.display = 'block';
   } finally {
     btn.disabled = false;
   }
 }
- 
-// Wrap update to inject dollar-denominated stop rows when price is known
+
+// Wrap update to inject dollar rows when live price is known
 const _origUpdate = update;
 update = function() {
   _origUpdate();
