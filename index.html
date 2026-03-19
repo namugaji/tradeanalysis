@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BTC Trading Strategy Analyzer</title>
+  <title>Trading Strategy Analyzer</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -275,13 +275,13 @@ const T = {
     feeStr: (pct) => `포지션의 ${pct}%`,
     presetsLabel: '시장 프리셋 (실시간 데이터)',
     livePriceLabel: '현재 가격',
-    stopDollarLabel: '손절 거리 (금액)',
+    stopDollarLabel: '손절 거리 (가격 기준)',
     fetchingLabel: '데이터 로딩 중...',
     fetchErrorLabel: '데이터를 불러오지 못했습니다. 인터넷 연결을 확인하세요.',
     liveDataNote: (sym, price) => `${sym} — 현재가 ${price} (야후파이낸스/바이낸스, 비공식)`,
     atrLabel: '현재 ATR%',
     stopMultLabel: '손절 배수 (ATR 기준)',
-    stopDistLabel: '손절 거리',
+    stopDistLabel: '손절 거리 (진입가 기준 %)',
     posSizeLabel: '권장 포지션 크기',
     noiseRiskLabel: '노이즈 손절 위험',
     leverageWarning: ' ⚠ 레버리지 필요',
@@ -351,13 +351,13 @@ const T = {
     ofPosition: 'of position',
     presetsLabel: 'Market presets (live data)',
     livePriceLabel: 'Current price',
-    stopDollarLabel: 'Stop distance ($)',
+    stopDollarLabel: 'Stop distance (price terms)',
     fetchingLabel: 'Loading live data...',
     fetchErrorLabel: 'Could not load live data. Check your internet connection.',
     liveDataNote: (sym, price) => `${sym} — price ${price} (Yahoo Finance / Binance, unofficial)`,
     atrLabel: 'Current ATR%',
     stopMultLabel: 'Stop multiple (× ATR)',
-    stopDistLabel: 'Stop distance',
+    stopDistLabel: 'Stop distance (% of entry price)',
     posSizeLabel: 'Suggested position size',
     noiseRiskLabel: 'Noise stop-out risk',
     leverageWarning: ' ⚠ requires leverage',
@@ -648,6 +648,7 @@ update();
 // ── Live data / presets ──────────────────────────────────────────────────────
 
 let livePrice = null;
+let livePriceUnit = '$';
 let activePreset = null;
 
 function parseOHLCV(rows, mapper) {
@@ -682,6 +683,7 @@ const PRESETS = {
   btc: {
     label: 'BTC Perp',
     feeDefault: 8,
+    priceUnit: '$',
     async fetch() {
       // Kraken public REST — genuinely CORS-friendly, no proxy needed
       // interval 1440 = daily candles
@@ -695,11 +697,13 @@ const PRESETS = {
   es: {
     label: 'ES (S&P 500 Futures)',
     feeDefault: 2,
+    priceUnit: 'pts',
     async fetch() { return fetchYahoo('ES=F'); }
   },
   nq: {
     label: 'NQ (Nasdaq Futures)',
     feeDefault: 2,
+    priceUnit: 'pts',
     async fetch() { return fetchYahoo('NQ=F'); }
   }
 };
@@ -749,14 +753,17 @@ async function loadPreset(key) {
 
   try {
     const { price, atrPct } = await preset.fetch();
-    livePrice    = price;
-    activePreset = key;
+    livePrice     = price;
+    livePriceUnit = preset.priceUnit;
+    activePreset  = key;
 
     const atrEl = document.getElementById('atr');
     atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
     document.getElementById('fee').value = preset.feeDefault;
 
-    const priceStr = '$' + Math.round(price).toLocaleString();
+    const priceStr = livePriceUnit === 'pts'
+      ? Math.round(price).toLocaleString() + ' pts'
+      : '$' + Math.round(price).toLocaleString();
     badge.innerHTML = T[currentLang].liveDataNote(preset.label, priceStr);
     update();
   } catch(e) {
@@ -780,10 +787,14 @@ update = function() {
   const stopDist = atrPct * stopMult;
   if (livePrice && stopDist > 0) {
     const stopDollar = livePrice * stopDist / 100;
-    document.getElementById('live-price-display').textContent =
-      '$' + Math.round(livePrice).toLocaleString();
-    document.getElementById('stop-dollar').textContent =
-      '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const priceDisplay = livePriceUnit === 'pts'
+      ? Math.round(livePrice).toLocaleString() + ' pts'
+      : '$' + Math.round(livePrice).toLocaleString();
+    const stopDisplay = livePriceUnit === 'pts'
+      ? stopDollar.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' pts'
+      : '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    document.getElementById('live-price-display').textContent = priceDisplay;
+    document.getElementById('stop-dollar').textContent = stopDisplay;
     document.getElementById('row-live-price').style.display  = '';
     document.getElementById('row-stop-dollar').style.display = '';
   } else {
