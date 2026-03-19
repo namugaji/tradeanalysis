@@ -705,23 +705,31 @@ const PRESETS = {
 };
 
 async function fetchYahoo(ticker) {
-  const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`;
-  let data;
-  try {
-    // Try direct first (works in some environments)
-    data = await timedFetch(url);
-  } catch {
-    // Fall back to allorigins proxy
-    data = await viaAllorigins(url);
+  const urls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=30d`,
+    `https://query1.finance.yahoo.com/v7/finance/chart/${ticker}?interval=1d&range=30d`,
+  ];
+  let lastErr;
+  for (const url of urls) {
+    for (const fetcher of [u => timedFetch(u, 12000), u => viaAllorigins(u)]) {
+      try {
+        const data = await fetcher(url);
+        const q      = data.chart.result[0];
+        const highs  = q.indicators.quote[0].high;
+        const lows   = q.indicators.quote[0].low;
+        const closes = q.indicators.quote[0].close;
+        return parseOHLCV(
+          highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
+          r => r
+        );
+      } catch(e) {
+        lastErr = e;
+        await new Promise(r => setTimeout(r, 600)); // brief pause before retry
+      }
+    }
   }
-  const q      = data.chart.result[0];
-  const highs  = q.indicators.quote[0].high;
-  const lows   = q.indicators.quote[0].low;
-  const closes = q.indicators.quote[0].close;
-  return parseOHLCV(
-    highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
-    r => r
-  );
+  throw lastErr || new Error('Yahoo Finance unavailable for ' + ticker);
 }
 
 async function loadPreset(key) {
@@ -748,7 +756,7 @@ async function loadPreset(key) {
     atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
     document.getElementById('fee').value = preset.feeDefault;
 
-    const priceStr = t('currencySymbol') + Math.round(price).toLocaleString();
+    const priceStr = '$' + Math.round(price).toLocaleString();
     badge.innerHTML = T[currentLang].liveDataNote(preset.label, priceStr);
     update();
   } catch(e) {
@@ -773,9 +781,9 @@ update = function() {
   if (livePrice && stopDist > 0) {
     const stopDollar = livePrice * stopDist / 100;
     document.getElementById('live-price-display').textContent =
-      t('currencySymbol') + Math.round(livePrice).toLocaleString();
+      '$' + Math.round(livePrice).toLocaleString();
     document.getElementById('stop-dollar').textContent =
-      t('currencySymbol') + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
     document.getElementById('row-live-price').style.display  = '';
     document.getElementById('row-stop-dollar').style.display = '';
   } else {
