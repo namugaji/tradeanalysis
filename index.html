@@ -76,9 +76,18 @@
     .tip.sec:hover .tip-box-lg { display: block; }
     .tip-box-lg { display: none; position: absolute; left: 20px; top: -4px; width: 300px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.6; padding: 9px 12px; border-radius: 7px; z-index: 100; pointer-events: none; text-transform: none; letter-spacing: normal; }
     .tip-box-lg::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
+    .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 860px) {
       .tip-box, .tip-box-lg { position: fixed; left: 1rem; right: 1rem; top: auto; bottom: 1rem; width: auto; max-width: none; }
       .tip-box::before, .tip-box-lg::before { display: none; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 1rem 1rem 2rem; }
+      .controls { grid-template-columns: 1fr; gap: 0.75rem; }
+      .grid-2col { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .ev-row { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 0; }
+      .ev-row span:last-child { font-size: 13px; font-weight: 500; }
     }
     .tip.tap-active .tip-box, .tip.tap-active .tip-box-lg { display: block; }
     .ticker-search-wrap { position: relative; min-width: 220px; }
@@ -269,7 +278,7 @@
           <div class="metric-sub" data-i18n="mcP5sub"></div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="grid-2col">
         <div>
           <div style="font-size:12px;color:#555;margin-bottom:4px;" data-i18n="mcFanLabel"></div>
           <div style="position:relative;height:220px;"><canvas id="mc-fan-chart"></canvas></div>
@@ -307,7 +316,7 @@
     <div id="sa-results" style="display:none;">
 
       <div style="font-size:12px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;" data-i18n="saSmLabel"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;">
+      <div class="grid-2col" style="margin-bottom:2rem;">
         <div>
           <div style="font-size:11px;color:#555;margin-bottom:3px;" data-i18n="saParamWR"></div>
           <div style="position:relative;height:160px;"><canvas id="sa-wr-chart"></canvas></div>
@@ -328,7 +337,7 @@
 
       <div style="font-size:12px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:flex;align-items:center;"><span data-i18n="saHmLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_heatmap"></span></span></div>
       <p style="font-size:12px;color:#555;margin:0 0 0.75rem;" data-i18n="saHmDesc"></p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.5rem;">
+      <div class="grid-2col" style="margin-bottom:0.5rem;">
         <div>
           <label style="font-size:12px;color:#555;" data-i18n="saHmXLabel"></label>
           <select id="sa-hm-x" style="padding:5px 8px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#111;margin-left:6px;">
