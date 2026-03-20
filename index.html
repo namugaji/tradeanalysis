@@ -75,6 +75,15 @@
     .tip.sec:hover .tip-box-lg { display: block; }
     .tip-box-lg { display: none; position: absolute; left: 20px; top: -4px; width: 300px; background: #222; color: #eee; font-size: 11px; font-weight: 400; line-height: 1.6; padding: 9px 12px; border-radius: 7px; z-index: 100; pointer-events: none; text-transform: none; letter-spacing: normal; }
     .tip-box-lg::before { content: ''; position: absolute; left: -5px; top: 10px; border-width: 5px 5px 5px 0; border-style: solid; border-color: transparent #222 transparent transparent; }
+    .ticker-search-wrap { position: relative; min-width: 220px; }
+    .ticker-search-wrap input[type=text] { width: 100%; padding: 7px 10px; font-size: 14px; font-weight: 500; border: 1px solid #ccc; border-radius: 8px; background: #fff; color: #111; box-sizing: border-box; }
+    .ticker-search-wrap input[type=text]:focus { outline: none; border-color: #185FA5; }
+    .ticker-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 280px; overflow-y: auto; background: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 8px 8px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .ticker-dropdown.open { display: block; }
+    .ticker-group-label { font-size: 11px; font-weight: 600; color: #888; padding: 6px 10px 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .ticker-option { padding: 6px 10px; font-size: 13px; color: #111; cursor: pointer; }
+    .ticker-option:hover, .ticker-option.highlighted { background: #eef4fc; }
+    .ticker-option.selected { color: #185FA5; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -99,88 +108,15 @@
     <div class="section-title"><span data-i18n="presetsLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_presets"></span></span></div>
     <div style="font-size:11px;color:#888;margin-bottom:8px;font-style:italic;" data-i18n="dataDelayNote"></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <select id="preset-select" style="padding:7px 10px;font-size:14px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;min-width:200px;">
-        <option value="custom">Custom</option>
-        <optgroup label="Crypto">
-          <option value="BTC">BTC (Bitcoin)</option>
-          <option value="ETH">ETH (Ethereum)</option>
-          <option value="SOL">SOL (Solana)</option>
-        </optgroup>
-        <optgroup label="Index ETFs">
-          <option value="SPY">SPY (S&P 500)</option>
-          <option value="QQQ">QQQ (Nasdaq 100)</option>
-          <option value="IWM">IWM (Russell 2000)</option>
-          <option value="DIA">DIA (Dow Jones)</option>
-        </optgroup>
-        <optgroup label="Leveraged ETFs">
-          <option value="TQQQ">TQQQ (3× Nasdaq)</option>
-          <option value="SQQQ">SQQQ (-3× Nasdaq)</option>
-          <option value="SOXL">SOXL (3× Semis)</option>
-          <option value="SOXS">SOXS (-3× Semis)</option>
-          <option value="SPXL">SPXL (3× S&P)</option>
-          <option value="UPRO">UPRO (3× S&P)</option>
-        </optgroup>
-        <optgroup label="Sector ETFs">
-          <option value="SMH">SMH (Semiconductors)</option>
-          <option value="XLF">XLF (Financials)</option>
-          <option value="XLE">XLE (Energy)</option>
-          <option value="XBI">XBI (Biotech)</option>
-          <option value="GDX">GDX (Gold Miners)</option>
-          <option value="ARKK">ARKK (Innovation)</option>
-        </optgroup>
-        <optgroup label="Commodity / Bond">
-          <option value="GLD">GLD (Gold)</option>
-          <option value="SLV">SLV (Silver)</option>
-          <option value="TLT">TLT (20yr Treasury)</option>
-          <option value="USO">USO (Oil)</option>
-          <option value="UVXY">UVXY (2× VIX)</option>
-        </optgroup>
-        <optgroup label="Crypto ETFs">
-          <option value="IBIT">IBIT (Bitcoin ETF)</option>
-          <option value="ETHA">ETHA (Ethereum ETF)</option>
-          <option value="BITO">BITO (Bitcoin Strategy)</option>
-          <option value="BITX">BITX (2× Bitcoin)</option>
-        </optgroup>
-        <optgroup label="Mega Cap">
-          <option value="NVDA">NVDA (Nvidia)</option>
-          <option value="AAPL">AAPL (Apple)</option>
-          <option value="GOOG">GOOG (Alphabet)</option>
-          <option value="MSFT">MSFT (Microsoft)</option>
-          <option value="AMZN">AMZN (Amazon)</option>
-          <option value="META">META (Meta)</option>
-          <option value="TSLA">TSLA (Tesla)</option>
-          <option value="BRK-B">BRK-B (Berkshire)</option>
-          <option value="AVGO">AVGO (Broadcom)</option>
-          <option value="LLY">LLY (Eli Lilly)</option>
-        </optgroup>
-        <optgroup label="Large Cap">
-          <option value="JPM">JPM (JPMorgan)</option>
-          <option value="V">V (Visa)</option>
-          <option value="MA">MA (Mastercard)</option>
-          <option value="UNH">UNH (UnitedHealth)</option>
-          <option value="XOM">XOM (Exxon)</option>
-          <option value="COST">COST (Costco)</option>
-          <option value="HD">HD (Home Depot)</option>
-          <option value="WMT">WMT (Walmart)</option>
-          <option value="PG">PG (Procter & Gamble)</option>
-          <option value="JNJ">JNJ (Johnson & Johnson)</option>
-          <option value="ABBV">ABBV (AbbVie)</option>
-          <option value="CRM">CRM (Salesforce)</option>
-          <option value="NFLX">NFLX (Netflix)</option>
-          <option value="AMD">AMD (AMD)</option>
-          <option value="ORCL">ORCL (Oracle)</option>
-          <option value="MRK">MRK (Merck)</option>
-          <option value="PEP">PEP (PepsiCo)</option>
-          <option value="KO">KO (Coca-Cola)</option>
-          <option value="ADBE">ADBE (Adobe)</option>
-          <option value="ACN">ACN (Accenture)</option>
-          <option value="COIN">COIN (Coinbase)</option>
-        </optgroup>
-      </select>
+      <div class="ticker-search-wrap" id="ticker-search-wrap">
+        <input type="text" id="ticker-input" placeholder="Search ticker..." autocomplete="off" value="QQQ (Nasdaq 100)">
+        <input type="hidden" id="ticker-value" value="QQQ">
+        <div class="ticker-dropdown" id="ticker-dropdown"></div>
+      </div>
       <button id="preset-load-btn" onclick="loadPreset()" style="padding:7px 16px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;" data-i18n="presetLoadBtn"></button>
     </div>
     <div class="live-badge" id="live-badge" style="margin-top:6px;"></div>
-    <div class="custom-price-row" id="custom-price-row">
+    <div class="custom-price-row" id="custom-price-row" style="display:none;">
       <label data-i18n="customPriceLabel"></label>
       <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" value="1000" oninput="onCustomPrice()">
     </div>
@@ -548,7 +484,7 @@ const T = {
       tip_mcRuin:    '포트폴리오가 이 손실률에 도달하면 파산으로 간주. 개인 리스크 허용 범위에 따라 설정.',
     },
     stips: {
-      stip_presets:   '드롭다운에서 종목을 선택하고 "데이터 조회"를 클릭하면 현재 가격과 ATR%를 조회합니다. 주식/ETF는 Google Sheets를 통해, 암호화폐(BTC/ETH/SOL)는 Kraken/Binance API를 통해 데이터를 가져옵니다. 가격과 ATR은 최대 20분 지연될 수 있으며, 정밀 체결용이 아닌 전략 분석용입니다.',
+      stip_presets:   '드롭다운에서 종목을 선택하고 "데이터 조회"를 클릭하면 현재 가격과 ATR%를 조회합니다. 주식/ETF는 Google Sheets를 통해, 암호화폐(BTC/ETH/SOL)는 Kraken API를 통해 데이터를 가져옵니다. 가격과 ATR은 최대 20분 지연될 수 있으며, 정밀 체결용이 아닌 전략 분석용입니다.',
       stip_portfolio: '총 매매 자본금. 모든 달러 금액 계산의 기준이 됩니다. 실제 매매 계좌 잔액을 입력하세요.',
       stip_params:    '전략의 핵심 가정값입니다. 승률과 손익비는 당신의 엣지를 나타내며 백테스트나 실거래 기록에서 도출해야 합니다. ATR과 손절 배수는 포지션 사이징에 영향을 미칩니다. 수수료와 슬리피지는 매매 비용을 반영합니다.',
       stip_sizing:    '이 섹션은 ATR 기반 손절 거리와 최대 손실 %를 결합하여 포지션 크기를 도출합니다. 핵심 공식: 포지션 크기 = 최대 손실% ÷ 손절 거리%. 이렇게 하면 손절 시 손실이 정확히 최대 손실%가 됩니다.',
@@ -689,7 +625,7 @@ const T = {
       tip_mcRuin:    'A simulation path is counted as "ruin" if the portfolio drawdown ever hits this threshold. Set based on your personal pain tolerance.',
     },
     stips: {
-      stip_presets:   'Select a ticker and click Load to fetch current price and ATR%. Stocks and ETFs come from a Google Sheet powered by GOOGLEFINANCE. Crypto (BTC, ETH, SOL) is fetched from Kraken/Binance. Prices and ATR may be delayed up to 20 minutes — this is for strategy analysis, not precise order execution.',
+      stip_presets:   'Select a ticker and click Load to fetch current price and ATR%. Stocks and ETFs come from a Google Sheet powered by GOOGLEFINANCE. Crypto (BTC, ETH, SOL) is fetched from Kraken. Prices and ATR may be delayed up to 20 minutes — this is for strategy analysis, not precise order execution.',
       stip_portfolio: 'Your total trading capital. This is the base for all dollar calculations. Enter your actual account balance.',
       stip_params:    'The core assumptions of your strategy. Win rate and R:R represent your edge — derive these from backtests or live records. ATR and stop multiple determine position sizing. Fee and slippage represent your cost of trading.',
       stip_sizing:    'Derives position size from ATR-based stop distance and your max loss %. Core formula: position size = max loss % ÷ stop distance %. This ensures that if stopped out, your loss is exactly your max loss % — no more, no less.',
@@ -957,24 +893,28 @@ const CRYPTO_TICKERS = {
     async fetch() {
       const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*92));
       if (data.error && data.error.length) throw new Error(data.error[0]);
-      const rows = data.result['XXBTZUSD'] || data.result[Object.keys(data.result)[0]];
-      return parseOHLCV(rows, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+      const keys = Object.keys(data.result).filter(k => k !== 'last');
+      return parseOHLCV(data.result[keys[0]], r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
     }
   },
   ETH: {
     label: 'ETH (Ethereum)',
-    source: 'Binance',
+    source: 'Kraken',
     async fetch() {
-      const data = await timedFetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&limit=90');
-      return parseOHLCV(data, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=ETHUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*92));
+      if (data.error && data.error.length) throw new Error(data.error[0]);
+      const keys = Object.keys(data.result).filter(k => k !== 'last');
+      return parseOHLCV(data.result[keys[0]], r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
     }
   },
   SOL: {
     label: 'SOL (Solana)',
-    source: 'Binance',
+    source: 'Kraken',
     async fetch() {
-      const data = await timedFetch('https://api.binance.com/api/v3/klines?symbol=SOLUSDT&interval=1d&limit=90');
-      return parseOHLCV(data, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=SOLUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*92));
+      if (data.error && data.error.length) throw new Error(data.error[0]);
+      const keys = Object.keys(data.result).filter(k => k !== 'last');
+      return parseOHLCV(data.result[keys[0]], r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
     }
   }
 };
@@ -1067,8 +1007,7 @@ function applyPresetData(ticker, price, atrPct, atrPctile, source) {
 }
 
 async function loadPreset() {
-  const select = document.getElementById('preset-select');
-  const ticker = select.value;
+  const ticker = document.getElementById('ticker-value').value;
   const badge  = document.getElementById('live-badge');
   const errEl  = document.getElementById('live-error');
 
@@ -1090,12 +1029,10 @@ async function loadPreset() {
 
   try {
     if (CRYPTO_TICKERS[ticker]) {
-      // Direct API for crypto
       const crypto = CRYPTO_TICKERS[ticker];
       const { price, atrPct, atrPctile } = await crypto.fetch();
       applyPresetData(ticker, price, atrPct, atrPctile, crypto.source);
     } else {
-      // Google Sheet for stocks/ETFs
       const sheetData = await fetchSheetData(false);
       const row = sheetData[ticker];
       if (!row || isNaN(row.price)) throw new Error(ticker + ' not found in sheet data');
@@ -1111,11 +1048,172 @@ async function loadPreset() {
   }
 }
 
-// Show custom price row on dropdown change
-document.getElementById('preset-select').addEventListener('change', () => {
-  const ticker = document.getElementById('preset-select').value;
-  document.getElementById('custom-price-row').style.display = ticker === 'custom' ? 'flex' : 'none';
-});
+// ── Searchable ticker dropdown ──
+const TICKER_LIST = [
+  { value: 'custom', label: 'Custom', group: '' },
+  { value: 'BTC', label: 'BTC (Bitcoin)', group: 'Crypto' },
+  { value: 'ETH', label: 'ETH (Ethereum)', group: 'Crypto' },
+  { value: 'SOL', label: 'SOL (Solana)', group: 'Crypto' },
+  { value: 'SPY', label: 'SPY (S&P 500)', group: 'Index ETFs' },
+  { value: 'QQQ', label: 'QQQ (Nasdaq 100)', group: 'Index ETFs' },
+  { value: 'IWM', label: 'IWM (Russell 2000)', group: 'Index ETFs' },
+  { value: 'DIA', label: 'DIA (Dow Jones)', group: 'Index ETFs' },
+  { value: 'TQQQ', label: 'TQQQ (3× Nasdaq)', group: 'Leveraged ETFs' },
+  { value: 'SQQQ', label: 'SQQQ (-3× Nasdaq)', group: 'Leveraged ETFs' },
+  { value: 'SOXL', label: 'SOXL (3× Semis)', group: 'Leveraged ETFs' },
+  { value: 'SOXS', label: 'SOXS (-3× Semis)', group: 'Leveraged ETFs' },
+  { value: 'SPXL', label: 'SPXL (3× S&P)', group: 'Leveraged ETFs' },
+  { value: 'UPRO', label: 'UPRO (3× S&P)', group: 'Leveraged ETFs' },
+  { value: 'SMH', label: 'SMH (Semiconductors)', group: 'Sector ETFs' },
+  { value: 'XLF', label: 'XLF (Financials)', group: 'Sector ETFs' },
+  { value: 'XLE', label: 'XLE (Energy)', group: 'Sector ETFs' },
+  { value: 'XBI', label: 'XBI (Biotech)', group: 'Sector ETFs' },
+  { value: 'GDX', label: 'GDX (Gold Miners)', group: 'Sector ETFs' },
+  { value: 'ARKK', label: 'ARKK (Innovation)', group: 'Sector ETFs' },
+  { value: 'GLD', label: 'GLD (Gold)', group: 'Commodity / Bond' },
+  { value: 'SLV', label: 'SLV (Silver)', group: 'Commodity / Bond' },
+  { value: 'TLT', label: 'TLT (20yr Treasury)', group: 'Commodity / Bond' },
+  { value: 'USO', label: 'USO (Oil)', group: 'Commodity / Bond' },
+  { value: 'UVXY', label: 'UVXY (2× VIX)', group: 'Commodity / Bond' },
+  { value: 'IBIT', label: 'IBIT (Bitcoin ETF)', group: 'Crypto ETFs' },
+  { value: 'ETHA', label: 'ETHA (Ethereum ETF)', group: 'Crypto ETFs' },
+  { value: 'BITO', label: 'BITO (Bitcoin Strategy)', group: 'Crypto ETFs' },
+  { value: 'BITX', label: 'BITX (2× Bitcoin)', group: 'Crypto ETFs' },
+  { value: 'NVDA', label: 'NVDA (Nvidia)', group: 'Mega Cap' },
+  { value: 'AAPL', label: 'AAPL (Apple)', group: 'Mega Cap' },
+  { value: 'GOOG', label: 'GOOG (Alphabet)', group: 'Mega Cap' },
+  { value: 'MSFT', label: 'MSFT (Microsoft)', group: 'Mega Cap' },
+  { value: 'AMZN', label: 'AMZN (Amazon)', group: 'Mega Cap' },
+  { value: 'META', label: 'META (Meta)', group: 'Mega Cap' },
+  { value: 'TSLA', label: 'TSLA (Tesla)', group: 'Mega Cap' },
+  { value: 'BRK-B', label: 'BRK-B (Berkshire)', group: 'Mega Cap' },
+  { value: 'AVGO', label: 'AVGO (Broadcom)', group: 'Mega Cap' },
+  { value: 'LLY', label: 'LLY (Eli Lilly)', group: 'Mega Cap' },
+  { value: 'JPM', label: 'JPM (JPMorgan)', group: 'Large Cap' },
+  { value: 'V', label: 'V (Visa)', group: 'Large Cap' },
+  { value: 'MA', label: 'MA (Mastercard)', group: 'Large Cap' },
+  { value: 'UNH', label: 'UNH (UnitedHealth)', group: 'Large Cap' },
+  { value: 'XOM', label: 'XOM (Exxon)', group: 'Large Cap' },
+  { value: 'COST', label: 'COST (Costco)', group: 'Large Cap' },
+  { value: 'HD', label: 'HD (Home Depot)', group: 'Large Cap' },
+  { value: 'WMT', label: 'WMT (Walmart)', group: 'Large Cap' },
+  { value: 'PG', label: 'PG (Procter & Gamble)', group: 'Large Cap' },
+  { value: 'JNJ', label: 'JNJ (Johnson & Johnson)', group: 'Large Cap' },
+  { value: 'ABBV', label: 'ABBV (AbbVie)', group: 'Large Cap' },
+  { value: 'CRM', label: 'CRM (Salesforce)', group: 'Large Cap' },
+  { value: 'NFLX', label: 'NFLX (Netflix)', group: 'Large Cap' },
+  { value: 'AMD', label: 'AMD (AMD)', group: 'Large Cap' },
+  { value: 'ORCL', label: 'ORCL (Oracle)', group: 'Large Cap' },
+  { value: 'MRK', label: 'MRK (Merck)', group: 'Large Cap' },
+  { value: 'PEP', label: 'PEP (PepsiCo)', group: 'Large Cap' },
+  { value: 'KO', label: 'KO (Coca-Cola)', group: 'Large Cap' },
+  { value: 'ADBE', label: 'ADBE (Adobe)', group: 'Large Cap' },
+  { value: 'ACN', label: 'ACN (Accenture)', group: 'Large Cap' },
+  { value: 'COIN', label: 'COIN (Coinbase)', group: 'Large Cap' },
+];
+
+(function initTickerDropdown() {
+  const input    = document.getElementById('ticker-input');
+  const hidden   = document.getElementById('ticker-value');
+  const dropdown = document.getElementById('ticker-dropdown');
+  let highlightIdx = -1;
+
+  function renderDropdown(filter) {
+    const q = (filter || '').toLowerCase();
+    const filtered = TICKER_LIST.filter(t =>
+      !q || t.value.toLowerCase().includes(q) || t.label.toLowerCase().includes(q)
+    );
+    let html = '';
+    let lastGroup = null;
+    filtered.forEach((t, i) => {
+      if (t.group && t.group !== lastGroup) {
+        lastGroup = t.group;
+        html += `<div class="ticker-group-label">${t.group}</div>`;
+      }
+      const sel = t.value === hidden.value ? ' selected' : '';
+      html += `<div class="ticker-option${sel}" data-value="${t.value}" data-label="${t.label}">${t.label}</div>`;
+    });
+    if (!filtered.length) html = '<div style="padding:8px 10px;font-size:12px;color:#888;">No matches</div>';
+    dropdown.innerHTML = html;
+    highlightIdx = -1;
+  }
+
+  function openDropdown() {
+    renderDropdown(input.value === getSelectedLabel() ? '' : input.value);
+    dropdown.classList.add('open');
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    highlightIdx = -1;
+  }
+
+  function getSelectedLabel() {
+    const t = TICKER_LIST.find(t => t.value === hidden.value);
+    return t ? t.label : '';
+  }
+
+  function selectTicker(value, label) {
+    hidden.value = value;
+    input.value = label;
+    closeDropdown();
+    document.getElementById('custom-price-row').style.display = value === 'custom' ? 'flex' : 'none';
+  }
+
+  input.addEventListener('focus', () => {
+    input.select();
+    openDropdown();
+  });
+
+  input.addEventListener('input', () => {
+    openDropdown();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.ticker-option');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightIdx));
+      if (items[highlightIdx]) items[highlightIdx].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightIdx = Math.max(highlightIdx - 1, 0);
+      items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightIdx));
+      if (items[highlightIdx]) items[highlightIdx].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightIdx >= 0 && items[highlightIdx]) {
+        selectTicker(items[highlightIdx].dataset.value, items[highlightIdx].dataset.label);
+      }
+    } else if (e.key === 'Escape') {
+      input.value = getSelectedLabel();
+      closeDropdown();
+      input.blur();
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    // Delay to allow click on dropdown item
+    setTimeout(() => {
+      if (!dropdown.matches(':hover')) {
+        input.value = getSelectedLabel();
+        closeDropdown();
+      }
+    }, 150);
+  });
+
+  dropdown.addEventListener('mousedown', (e) => {
+    const opt = e.target.closest('.ticker-option');
+    if (opt) {
+      selectTicker(opt.dataset.value, opt.dataset.label);
+      input.blur();
+    }
+  });
+})();
+
+// Auto-load QQQ on page init
+loadPreset();
 
 // Wrap update to inject dollar rows when live price is known
 const _origUpdate = update;
