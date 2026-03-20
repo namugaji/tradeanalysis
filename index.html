@@ -61,12 +61,7 @@
     .error-msg { font-size: 12px; color: #E24B4A; margin-top: 4px; display: none; }
     .lang-btn { font-size: 13px; padding: 5px 14px; border-radius: 8px; border: 1px solid #cccccc; background: #fff; color: #111111; cursor: pointer; }
     .lang-btn:hover { background: #f2f2f2; }
-    .preset-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
-    .preset-btn { font-size: 13px; padding: 5px 14px; border-radius: 8px; border: 1px solid #cccccc; background: #fff; color: #111111; cursor: pointer; }
-    .preset-btn:hover { background: #f2f2f2; }
-    .preset-btn.active { border-color: #185FA5; color: #185FA5; background: #eef4fc; }
-    .preset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .live-badge { font-size: 12px; color: #555; margin-left: auto; }
+    .live-badge { font-size: 12px; color: #555; }
     .live-badge span { font-weight: 500; color: #111; }
     .custom-price-row { display: none; align-items: center; gap: 8px; margin-top: 8px; }
     .custom-price-row input { padding: 6px 10px; font-size: 14px; font-weight: 500; border: 1px solid #cccccc; border-radius: 8px; background: #fff; color: #111; width: 160px; }
@@ -104,15 +99,88 @@
   <div class="section">
     <div class="section-title"><span data-i18n="presetsLabel"></span><span class="tip sec">i<span class="tip-box-lg" data-i18n-tip="stip_presets"></span></span></div>
     <div class="unstable-note" data-i18n="unstableNote"></div>
-    <div class="preset-bar">
-      <button class="preset-btn active" id="btn-custom" onclick="loadPreset('custom')">Custom</button>
-      <button class="preset-btn" id="btn-btc"  onclick="loadPreset('btc')">BTC Perp</button>
-      <button class="preset-btn" id="btn-spy"  onclick="loadPreset('spy')">S&amp;P 500 (SPY)</button>
-      <button class="preset-btn" id="btn-qqq"  onclick="loadPreset('qqq')">Nasdaq (QQQ)</button>
-      <button class="preset-btn" id="btn-es" onclick="loadPreset('es')">ES Futures</button>
-      <button class="preset-btn" id="btn-nq" onclick="loadPreset('nq')">NQ Futures</button>
-      <div class="live-badge" id="live-badge"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="preset-select" style="padding:7px 10px;font-size:14px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;min-width:200px;">
+        <option value="custom">Custom</option>
+        <optgroup label="Crypto">
+          <option value="BTC">BTC (Bitcoin)</option>
+          <option value="ETH">ETH (Ethereum)</option>
+          <option value="SOL">SOL (Solana)</option>
+        </optgroup>
+        <optgroup label="Index ETFs">
+          <option value="SPY">SPY (S&P 500)</option>
+          <option value="QQQ">QQQ (Nasdaq 100)</option>
+          <option value="IWM">IWM (Russell 2000)</option>
+          <option value="DIA">DIA (Dow Jones)</option>
+        </optgroup>
+        <optgroup label="Leveraged ETFs">
+          <option value="TQQQ">TQQQ (3× Nasdaq)</option>
+          <option value="SQQQ">SQQQ (-3× Nasdaq)</option>
+          <option value="SOXL">SOXL (3× Semis)</option>
+          <option value="SOXS">SOXS (-3× Semis)</option>
+          <option value="SPXL">SPXL (3× S&P)</option>
+          <option value="UPRO">UPRO (3× S&P)</option>
+        </optgroup>
+        <optgroup label="Sector ETFs">
+          <option value="SMH">SMH (Semiconductors)</option>
+          <option value="XLF">XLF (Financials)</option>
+          <option value="XLE">XLE (Energy)</option>
+          <option value="XBI">XBI (Biotech)</option>
+          <option value="GDX">GDX (Gold Miners)</option>
+          <option value="ARKK">ARKK (Innovation)</option>
+        </optgroup>
+        <optgroup label="Commodity / Bond">
+          <option value="GLD">GLD (Gold)</option>
+          <option value="SLV">SLV (Silver)</option>
+          <option value="TLT">TLT (20yr Treasury)</option>
+          <option value="USO">USO (Oil)</option>
+          <option value="UVXY">UVXY (2× VIX)</option>
+        </optgroup>
+        <optgroup label="Crypto ETFs">
+          <option value="IBIT">IBIT (Bitcoin ETF)</option>
+          <option value="ETHA">ETHA (Ethereum ETF)</option>
+          <option value="BITO">BITO (Bitcoin Strategy)</option>
+          <option value="BITX">BITX (2× Bitcoin)</option>
+        </optgroup>
+        <optgroup label="Mega Cap">
+          <option value="NVDA">NVDA (Nvidia)</option>
+          <option value="AAPL">AAPL (Apple)</option>
+          <option value="GOOG">GOOG (Alphabet)</option>
+          <option value="MSFT">MSFT (Microsoft)</option>
+          <option value="AMZN">AMZN (Amazon)</option>
+          <option value="META">META (Meta)</option>
+          <option value="TSLA">TSLA (Tesla)</option>
+          <option value="BRK-B">BRK-B (Berkshire)</option>
+          <option value="AVGO">AVGO (Broadcom)</option>
+          <option value="LLY">LLY (Eli Lilly)</option>
+        </optgroup>
+        <optgroup label="Large Cap">
+          <option value="JPM">JPM (JPMorgan)</option>
+          <option value="V">V (Visa)</option>
+          <option value="MA">MA (Mastercard)</option>
+          <option value="UNH">UNH (UnitedHealth)</option>
+          <option value="XOM">XOM (Exxon)</option>
+          <option value="COST">COST (Costco)</option>
+          <option value="HD">HD (Home Depot)</option>
+          <option value="WMT">WMT (Walmart)</option>
+          <option value="PG">PG (Procter & Gamble)</option>
+          <option value="JNJ">JNJ (Johnson & Johnson)</option>
+          <option value="ABBV">ABBV (AbbVie)</option>
+          <option value="CRM">CRM (Salesforce)</option>
+          <option value="NFLX">NFLX (Netflix)</option>
+          <option value="AMD">AMD (AMD)</option>
+          <option value="ORCL">ORCL (Oracle)</option>
+          <option value="MRK">MRK (Merck)</option>
+          <option value="PEP">PEP (PepsiCo)</option>
+          <option value="KO">KO (Coca-Cola)</option>
+          <option value="ADBE">ADBE (Adobe)</option>
+          <option value="ACN">ACN (Accenture)</option>
+          <option value="COIN">COIN (Coinbase)</option>
+        </optgroup>
+      </select>
+      <button id="preset-load-btn" onclick="loadPreset()" style="padding:7px 16px;font-size:13px;border-radius:8px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:pointer;" data-i18n="presetLoadBtn"></button>
     </div>
+    <div class="live-badge" id="live-badge" style="margin-top:6px;"></div>
     <div class="custom-price-row" id="custom-price-row">
       <label data-i18n="customPriceLabel"></label>
       <input type="number" id="custom-price" min="0" step="any" placeholder="e.g. 105000" value="1000" oninput="onCustomPrice()">
@@ -398,14 +466,15 @@ const T = {
     ofPosition: '포지션의',
     feeStr: (pct) => `포지션의 ${pct}%`,
     presetsLabel: '시장 프리셋',
-    unstableNote: '⚠ 클릭 시 무료 API에서 현재 가격과 ATR을 1회 조회합니다. 반복 클릭 시 요청이 제한될 수 있습니다.',
+    unstableNote: '⚠ 클릭 시 무료 API/Google Sheets에서 현재 가격과 ATR을 1회 조회합니다. 반복 클릭 시 요청이 제한될 수 있습니다.',
+    presetLoadBtn: '데이터 조회',
     customLabel: '직접 입력',
     customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
     stopDollarLabel: '손절 거리 (가격 기준)',
     fetchingLabel: '데이터 로딩 중...',
     fetchErrorLabel: '데이터를 불러오지 못했습니다. 인터넷 연결을 확인하세요.',
-    liveDataNote: (sym, price) => `${sym} — 현재가 ${price} (야후파이낸스/바이낸스, 비공식)`,
+    liveDataNote: (sym, price, source) => `${sym} — 현재가 ${price} (${source})`,
     atrLabel: '현재 ATR%',
     stopMultLabel: '손절 배수 (ATR 기준)',
     stopDistLabel: '손절 거리 (진입가 기준 %)',
@@ -459,7 +528,7 @@ const T = {
       tip_tm:        '한 달 동안 실행할 예상 매매 수 (진입+청산 = 1 매매).',
       tip_rpt:       '단일 매매에서 허용할 최대 손실액 (포트폴리오 대비 %). 리스크 허용 범위에 따라 직접 설정.',
       tip_atr:       '14일 평균 실제 범위를 현재 가격으로 나눈 값. 일반적인 일일 변동성을 나타냄. 차팅 플랫폼에서 확인 가능.',
-      tip_mult:      'ATR의 배수로 손절을 설정해 일반적인 노이즈 위에 여유 공간 확보. 1.5× 이하는 일반 변동성에 자주 손절될 수 있음.',
+      tip_mult:      'ATR의 배수로 손절을 설정해 일상적인 가격 노이즈 위에 여유 공간(breathing room)을 확보. 1.5× 이하는 자주 손절될 수 있음. 이 배수는 진입 스타일(지지선 근접 진입 vs 모멘텀 진입)에 맞춰 설정하는 값이며, 변동성 변화에 대한 조정은 ATR%가 자동으로 반영합니다.',
       tip_fee:       '매수 또는 매도 주문 1건당 수수료 (포지션 크기 대비 %). 왕복(매수+매도) 비용은 2×.',
       tip_slip:      '손절이 빠르게 움직이는 시장에서 지정가보다 불리한 가격에 체결될 때 발생. 포지션 크기 대비 %로 입력.',
       tip_stopDist:  '진입가 대비 손절 위치의 거리 (ATR% × 손절 배수).',
@@ -480,7 +549,7 @@ const T = {
       tip_mcRuin:    '포트폴리오가 이 손실률에 도달하면 파산으로 간주. 개인 리스크 허용 범위에 따라 설정.',
     },
     stips: {
-      stip_presets:   '시장 프리셋을 클릭하면 현재 가격과 ATR%를 무료 API에서 1회 조회합니다. 자동 갱신되지 않으며, 새 데이터가 필요하면 다시 클릭하세요. BTC는 Kraken, SPY/QQQ/ES/NQ는 Yahoo Finance를 사용합니다. 무료 API이므로 반복 클릭 시 요청이 제한되거나 실패할 수 있습니다.',
+      stip_presets:   '드롭다운에서 종목을 선택하고 "데이터 조회"를 클릭하면 현재 가격과 ATR%를 조회합니다. 주식/ETF는 Google Sheets를 통해, 암호화폐(BTC/ETH/SOL)는 Kraken/Binance API를 통해 데이터를 가져옵니다. 데이터는 탭을 닫을 때까지 캐시되며, 15초 쿨다운이 있습니다.',
       stip_portfolio: '총 매매 자본금. 모든 달러 금액 계산의 기준이 됩니다. 실제 매매 계좌 잔액을 입력하세요.',
       stip_params:    '전략의 핵심 가정값입니다. 승률과 손익비는 당신의 엣지를 나타내며 백테스트나 실거래 기록에서 도출해야 합니다. ATR과 손절 배수는 포지션 사이징에 영향을 미칩니다. 수수료와 슬리피지는 매매 비용을 반영합니다.',
       stip_sizing:    '이 섹션은 ATR 기반 손절 거리와 최대 손실 %를 결합하여 포지션 크기를 도출합니다. 핵심 공식: 포지션 크기 = 최대 손실% ÷ 손절 거리%. 이렇게 하면 손절 시 손실이 정확히 최대 손실%가 됩니다.',
@@ -537,14 +606,15 @@ const T = {
     yours: 'yours',
     ofPosition: 'of position',
     presetsLabel: 'Market presets',
-    unstableNote: '⚠ Clicking a preset queries current price and ATR once via free APIs. Repeated clicks may get throttled.',
+    unstableNote: '⚠ Clicking Load queries current price and ATR once. Repeated clicks may get throttled.',
+    presetLoadBtn: 'Load data',
     customLabel: 'Custom',
     customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
     stopDollarLabel: 'Stop distance (price terms)',
     fetchingLabel: 'Fetching data...',
     fetchErrorLabel: 'Could not fetch data. Check your connection or try again later.',
-    liveDataNote: (sym, price) => `${sym} — price ${price} (Yahoo Finance / Binance, unofficial)`,
+    liveDataNote: (sym, price, source) => `${sym} — ${price} (${source})`,
     atrLabel: 'Current ATR%',
     stopMultLabel: 'Stop multiple (× ATR)',
     stopDistLabel: 'Stop distance (% of entry price)',
@@ -599,7 +669,7 @@ const T = {
       tip_tm:        'How many trades you expect to take in a month.',
       tip_rpt:       'The maximum loss you are willing to accept on a single trade, as a % of your portfolio. This is a personal risk tolerance setting.',
       tip_atr:       '14-day Average True Range divided by the current price. Represents typical daily volatility. Look this up on any charting platform.',
-      tip_mult:      'Places your stop at this multiple of ATR above the typical daily range, giving the trade room to breathe. Below 1.5× risks frequent noise stop-outs.',
+      tip_mult:      'Sets your stop at this multiple of ATR, giving the trade breathing room above normal price noise. Below 1.5× risks frequent noise stop-outs. Set this based on your entry style (tight near support vs. wide on momentum) — ATR% already adjusts for changing volatility automatically.',
       tip_fee:       'Fee charged per transaction (entry or exit) as a % of position size. Round-trip cost is 2×.',
       tip_slip:      'When a stop is hit in a fast-moving market you get a worse fill than your stop price. Enter as % of position size.',
       tip_stopDist:  'Distance from entry to stop loss as a % of entry price (ATR% × stop multiple).',
@@ -620,7 +690,7 @@ const T = {
       tip_mcRuin:    'A simulation path is counted as "ruin" if the portfolio drawdown ever hits this threshold. Set based on your personal pain tolerance.',
     },
     stips: {
-      stip_presets:   'Clicking a preset fetches the current price and ATR% once from a free API. Data does not auto-refresh — click again if you need updated values. BTC uses Kraken; SPY, QQQ, ES, and NQ use Yahoo Finance. Repeated clicks may be rate-limited or fail since these are free, unofficial APIs.',
+      stip_presets:   'Select a ticker from the dropdown and click Load to fetch current price and ATR%. Stocks and ETFs are sourced from a Google Sheet updated by GOOGLEFINANCE. Crypto (BTC, ETH, SOL) is fetched from Kraken/Binance APIs. Data is cached for the session with a 15-second cooldown between fetches.',
       stip_portfolio: 'Your total trading capital. This is the base for all dollar calculations. Enter your actual account balance.',
       stip_params:    'The core assumptions of your strategy. Win rate and R:R represent your edge — derive these from backtests or live records. ATR and stop multiple determine position sizing. Fee and slippage represent your cost of trading.',
       stip_sizing:    'Derives position size from ATR-based stop distance and your max loss %. Core formula: position size = max loss % ÷ stop distance %. This ensures that if stopped out, your loss is exactly your max loss % — no more, no less.',
@@ -873,23 +943,49 @@ portEl.addEventListener('blur', formatPortfolioInput);
 ['wr','rr','tm','rpt','fee','slippage','atr','stopmult'].forEach(id => {
   document.getElementById(id).addEventListener('input', update);
 });
-setActiveBtn('custom');
 update();
 
 // ── Live data / presets ──────────────────────────────────────────────────────
+
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0f_UXb1oD5UHk90h_KJhKg9kin1bLcNgIU5LMFTEjUn011iTWZZTeImkmcLP4eeK4fH8PC4iz0HU/pub?gid=427890857&single=true&output=csv';
+const SHEET_CACHE_KEY = 'trading_analyzer_sheet';
+const SHEET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const COOLDOWN_MS = 15000; // 15 seconds
+
+const CRYPTO_TICKERS = {
+  BTC: {
+    label: 'BTC (Bitcoin)',
+    source: 'Kraken',
+    async fetch() {
+      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*92));
+      if (data.error && data.error.length) throw new Error(data.error[0]);
+      const rows = data.result['XXBTZUSD'] || data.result[Object.keys(data.result)[0]];
+      return parseOHLCV(rows, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+    }
+  },
+  ETH: {
+    label: 'ETH (Ethereum)',
+    source: 'Binance',
+    async fetch() {
+      const data = await timedFetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&limit=90');
+      return parseOHLCV(data, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+    }
+  },
+  SOL: {
+    label: 'SOL (Solana)',
+    source: 'Binance',
+    async fetch() {
+      const data = await timedFetch('https://api.binance.com/api/v3/klines?symbol=SOLUSDT&interval=1d&limit=90');
+      return parseOHLCV(data, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
+    }
+  }
+};
 
 let livePrice = null;
 let livePriceUnit = '$';
 let liveAtrPctile = null;
 let activePreset = 'custom';
-
-function setActiveBtn(key) {
-  ['custom','btc','spy','qqq','es','nq'].forEach(k => {
-    document.getElementById('btn-' + k).classList.remove('active');
-  });
-  document.getElementById('btn-' + key).classList.add('active');
-  document.getElementById('custom-price-row').style.display = key === 'custom' ? 'flex' : 'none';
-}
+let cooldownTimer = null;
 
 function onCustomPrice() {
   const v = parseFloat(document.getElementById('custom-price').value);
@@ -902,17 +998,12 @@ function parseOHLCV(rows, mapper) {
   const candles = rows.map(mapper).filter(c => c.high != null && c.low != null && c.close != null);
   if (candles.length < 2) throw new Error('Not enough candle data');
   const price = candles[candles.length - 1].close;
-
-  // Compute True Range for each candle
   const trs = [];
   for (let i = 1; i < candles.length; i++) {
     const { high, low } = candles[i];
     const prev = candles[i - 1].close;
     trs.push(Math.max(high - low, Math.abs(high - prev), Math.abs(prev - low)));
   }
-
-  // Wilder's smoothed ATR (RMA): seed with SMA of first 14 TRs, then smooth
-  // This matches TradingView and most charting platforms
   const n = 14;
   if (trs.length < n) throw new Error('Not enough data for ATR-14');
   let atr = trs.slice(0, n).reduce((a, b) => a + b, 0) / n;
@@ -921,179 +1012,132 @@ function parseOHLCV(rows, mapper) {
     atr = (atr * (n - 1) + trs[i]) / n;
     atrSeries.push(atr);
   }
-
-  // Percentile rank: what fraction of the ATR series is below the current value
   const currentAtr = atrSeries[atrSeries.length - 1];
   const below = atrSeries.filter(v => v < currentAtr).length;
   const atrPctile = Math.round((below / atrSeries.length) * 100);
-
   return { price, atrPct: (currentAtr / price) * 100, atrPctile };
 }
 
-async function timedFetch(url, ms = 8000) {
+async function timedFetch(url, ms = 10000) {
   const res = await fetch(url, { signal: AbortSignal.timeout(ms) });
-  if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// Fetch via allorigins /raw (returns body directly, no wrapper)
-async function viaAllorigins(url) {
-  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const res   = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) throw new Error(`allorigins HTTP ${res.status}`);
-  return res.json();
-}
-
-const PRESETS = {
-  custom: {
-    label: 'Custom',
-    priceUnit: '$',
-  },
-  btc: {
-    label: 'BTC Perp',
-    feeDefault: 8,
-    priceUnit: '$',
-    async fetch() {
-      // Kraken public REST — genuinely CORS-friendly, no proxy needed
-      // interval 1440 = daily candles
-      const data = await timedFetch('https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440&since=' + Math.floor(Date.now()/1000 - 86400*62));
-      if (data.error && data.error.length) throw new Error(data.error[0]);
-      const rows = data.result['XXBTZUSD'] || data.result[Object.keys(data.result)[0]];
-      // Kraken OHLC: [time, open, high, low, close, vwap, volume, count]
-      return parseOHLCV(rows, r => ({ high: parseFloat(r[2]), low: parseFloat(r[3]), close: parseFloat(r[4]) }));
-    }
-  },
-  es: {
-    label: 'ES Futures',
-    feeDefault: 2,
-    priceUnit: 'pts',
-    async fetch() { return fetchYahoo('ES=F'); }
-  },
-  nq: {
-    label: 'NQ Futures',
-    feeDefault: 2,
-    priceUnit: 'pts',
-    async fetch() { return fetchYahoo('NQ=F'); }
-  },
-  spy: {
-    label: 'SPY (S&P 500 ETF)',
-    feeDefault: 1,
-    priceUnit: '$',
-    async fetch() { return fetchETF('spy'); }
-  },
-  qqq: {
-    label: 'QQQ (Nasdaq ETF)',
-    feeDefault: 1,
-    priceUnit: '$',
-    async fetch() { return fetchETF('qqq'); }
-  }
-};
-
-async function fetchYahoo(ticker) {
-  const urls = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`,
-    `https://query1.finance.yahoo.com/v7/finance/chart/${ticker}?interval=1d&range=3mo`,
-  ];
-  let lastErr;
-  for (const url of urls) {
-    for (const fetcher of [u => timedFetch(u, 12000), u => viaAllorigins(u)]) {
-      try {
-        const data = await fetcher(url);
-        const q      = data.chart.result[0];
-        const highs  = q.indicators.quote[0].high;
-        const lows   = q.indicators.quote[0].low;
-        const closes = q.indicators.quote[0].close;
-        return parseOHLCV(
-          highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
-          r => r
-        );
-      } catch(e) {
-        lastErr = e;
-        await new Promise(r => setTimeout(r, 600)); // brief pause before retry
+// Fetch and cache the Google Sheet summary CSV
+async function fetchSheetData(forceRefresh) {
+  // Check sessionStorage cache
+  if (!forceRefresh) {
+    try {
+      const cached = sessionStorage.getItem(SHEET_CACHE_KEY);
+      if (cached) {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < SHEET_CACHE_TTL) return data;
       }
-    }
+    } catch(e) {}
   }
-  throw lastErr || new Error('Yahoo Finance unavailable for ' + ticker);
+  const res = await fetch(SHEET_CSV_URL, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`Sheet HTTP ${res.status}`);
+  const text = await res.text();
+  const rows = text.trim().split('\n').slice(1); // skip header
+  const data = {};
+  rows.forEach(row => {
+    const cols = row.split(',');
+    if (cols.length >= 4 && cols[0] && cols[1]) {
+      data[cols[0].trim()] = {
+        price:    parseFloat(cols[1]),
+        atrPct:   parseFloat(cols[2]),
+        pctile:   parseInt(cols[3])
+      };
+    }
+  });
+  try { sessionStorage.setItem(SHEET_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch(e) {}
+  return data;
 }
 
-async function fetchETF(ticker) {
-  // ETFs (SPY, QQQ) are reliable on Yahoo Finance — use it directly
-  const yahooTicker = ticker.toUpperCase();
-  const urls = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=3mo`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=3mo`,
-  ];
-  let lastErr;
-  for (const url of urls) {
-    for (const fetcher of [u => timedFetch(u, 10000), u => viaAllorigins(u)]) {
-      try {
-        const data   = await fetcher(url);
-        const q      = data.chart.result[0];
-        const highs  = q.indicators.quote[0].high;
-        const lows   = q.indicators.quote[0].low;
-        const closes = q.indicators.quote[0].close;
-        return parseOHLCV(
-          highs.map((h, i) => ({ high: h, low: lows[i], close: closes[i] })),
-          r => r
-        );
-      } catch(e) { lastErr = e; }
+function startCooldown() {
+  const btn = document.getElementById('preset-load-btn');
+  btn.disabled = true;
+  let remaining = COOLDOWN_MS / 1000;
+  btn.textContent = remaining + 's';
+  cooldownTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+      btn.disabled = false;
+      btn.textContent = T[currentLang].presetLoadBtn;
+    } else {
+      btn.textContent = remaining + 's';
     }
-  }
-  throw lastErr || new Error('Could not fetch data for ' + ticker);
+  }, 1000);
 }
 
-async function loadPreset(key) {
-  const preset = PRESETS[key];
+function applyPresetData(ticker, price, atrPct, atrPctile, source) {
+  livePrice     = price;
+  livePriceUnit = '$';
+  liveAtrPctile = atrPctile;
+  activePreset  = ticker;
+
+  const atrEl = document.getElementById('atr');
+  atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
+
+  const priceStr = '$' + (price >= 1 ? Math.round(price).toLocaleString() : price.toFixed(2));
+  document.getElementById('live-badge').innerHTML = T[currentLang].liveDataNote(ticker, priceStr, source);
+  update();
+}
+
+async function loadPreset() {
+  const select = document.getElementById('preset-select');
+  const ticker = select.value;
   const badge  = document.getElementById('live-badge');
   const errEl  = document.getElementById('live-error');
 
-  setActiveBtn(key);
   errEl.style.display = 'none';
   badge.innerHTML = '';
+  document.getElementById('custom-price-row').style.display = ticker === 'custom' ? 'flex' : 'none';
 
-  if (key === 'custom') {
-    livePrice      = null;
-    liveAtrPctile  = null;
-    activePreset   = 'custom';
+  if (ticker === 'custom') {
+    livePrice     = null;
+    liveAtrPctile = null;
+    activePreset  = 'custom';
     const v = parseFloat(document.getElementById('custom-price').value);
     if (!isNaN(v) && v > 0) { livePrice = v; livePriceUnit = '$'; }
     update();
     return;
   }
 
-  const btn = document.getElementById('btn-' + key);
-  btn.disabled = true;
   badge.innerHTML = T[currentLang].fetchingLabel;
 
   try {
-    const { price, atrPct, atrPctile } = await preset.fetch();
-    livePrice      = price;
-    livePriceUnit  = preset.priceUnit;
-    liveAtrPctile  = atrPctile;
-    activePreset   = key;
-
-    const atrEl = document.getElementById('atr');
-    atrEl.value = Math.min(Math.max(Math.round(atrPct * 10), parseInt(atrEl.min)), parseInt(atrEl.max));
-    document.getElementById('fee').value = preset.feeDefault;
-
-    const priceStr = livePriceUnit === 'pts'
-      ? Math.round(price).toLocaleString() + ' pts'
-      : '$' + Math.round(price).toLocaleString();
-    badge.innerHTML = T[currentLang].liveDataNote(preset.label, priceStr);
-    update();
+    if (CRYPTO_TICKERS[ticker]) {
+      // Direct API for crypto
+      const crypto = CRYPTO_TICKERS[ticker];
+      const { price, atrPct, atrPctile } = await crypto.fetch();
+      applyPresetData(ticker, price, atrPct, atrPctile, crypto.source);
+    } else {
+      // Google Sheet for stocks/ETFs
+      const sheetData = await fetchSheetData(false);
+      const row = sheetData[ticker];
+      if (!row || isNaN(row.price)) throw new Error(ticker + ' not found in sheet data');
+      applyPresetData(ticker, row.price, row.atrPct, row.pctile, 'Google Sheets');
+    }
+    startCooldown();
   } catch(e) {
     console.error('Preset fetch failed:', e);
     livePrice     = null;
     liveAtrPctile = null;
     badge.innerHTML = '';
-    document.getElementById('btn-' + key).classList.remove('active');
     errEl.textContent   = T[currentLang].fetchErrorLabel + ' (' + e.message + ')';
     errEl.style.display = 'block';
-  } finally {
-    document.getElementById('btn-' + key).disabled = false;
   }
 }
+
+// Show custom price row on dropdown change
+document.getElementById('preset-select').addEventListener('change', () => {
+  const ticker = document.getElementById('preset-select').value;
+  document.getElementById('custom-price-row').style.display = ticker === 'custom' ? 'flex' : 'none';
+});
 
 // Wrap update to inject dollar rows when live price is known
 const _origUpdate = update;
@@ -1104,12 +1148,8 @@ update = function() {
   const stopDist = atrPct * stopMult;
   if (livePrice && stopDist > 0) {
     const stopDollar = livePrice * stopDist / 100;
-    const priceDisplay = livePriceUnit === 'pts'
-      ? Math.round(livePrice).toLocaleString() + ' pts'
-      : '$' + Math.round(livePrice).toLocaleString();
-    const stopDisplay = livePriceUnit === 'pts'
-      ? stopDollar.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' pts'
-      : '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const priceDisplay = '$' + (livePrice >= 1 ? Math.round(livePrice).toLocaleString() : livePrice.toFixed(2));
+    const stopDisplay = '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
     document.getElementById('live-price-display').textContent = priceDisplay;
     document.getElementById('stop-dollar').textContent = stopDisplay;
     document.getElementById('row-live-price').style.display  = '';
@@ -1119,7 +1159,7 @@ update = function() {
     document.getElementById('row-stop-dollar').style.display = 'none';
   }
 
-  // ATR percentile display — only when live data provides it
+  // ATR percentile display
   const pctileRow = document.getElementById('row-atr-pctile');
   if (liveAtrPctile !== null) {
     const pctileEl = document.getElementById('atr-pctile');
