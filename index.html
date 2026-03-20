@@ -402,7 +402,7 @@ const T = {
     feeStr: (pct) => `포지션의 ${pct}%`,
     presetsLabel: '시장 데이터 조회',
     presetLoadBtn: '데이터 조회',
-    dataDelayNote: '가격과 ATR은 최대 20분 지연될 수 있습니다. 전략 분석용이며 실시간 체결 데이터가 아닙니다.',
+    dataDelayNote: '주식/ETF 데이터는 최대 20분 지연될 수 있습니다. 암호화폐는 거의 실시간입니다. 전략 분석용이며 체결용 데이터가 아닙니다.',
     customLabel: '직접 입력',
     customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
@@ -484,7 +484,7 @@ const T = {
       tip_mcRuin:    '포트폴리오가 이 손실률에 도달하면 파산으로 간주. 개인 리스크 허용 범위에 따라 설정.',
     },
     stips: {
-      stip_presets:   '드롭다운에서 종목을 선택하고 "데이터 조회"를 클릭하면 현재 가격과 ATR%를 조회합니다. 주식/ETF는 Google Sheets를 통해, 암호화폐(BTC/ETH/SOL)는 Kraken API를 통해 데이터를 가져옵니다. 가격과 ATR은 최대 20분 지연될 수 있으며, 정밀 체결용이 아닌 전략 분석용입니다.',
+      stip_presets:   '드롭다운에서 종목을 선택하고 "데이터 조회"를 클릭하면 현재 가격과 ATR%를 조회합니다. 주식/ETF는 Google Sheets를 통해(최대 20분 지연), 암호화폐(BTC/ETH/SOL)는 Kraken API를 통해(거의 실시간) 데이터를 가져옵니다.',
       stip_portfolio: '총 매매 자본금. 모든 달러 금액 계산의 기준이 됩니다. 실제 매매 계좌 잔액을 입력하세요.',
       stip_params:    '전략의 핵심 가정값입니다. 승률과 손익비는 당신의 엣지를 나타내며 백테스트나 실거래 기록에서 도출해야 합니다. ATR과 손절 배수는 포지션 사이징에 영향을 미칩니다. 수수료와 슬리피지는 매매 비용을 반영합니다.',
       stip_sizing:    '이 섹션은 ATR 기반 손절 거리와 최대 손실 %를 결합하여 포지션 크기를 도출합니다. 핵심 공식: 포지션 크기 = 최대 손실% ÷ 손절 거리%. 이렇게 하면 손절 시 손실이 정확히 최대 손실%가 됩니다.',
@@ -542,7 +542,7 @@ const T = {
     ofPosition: 'of position',
     presetsLabel: 'Market data',
     presetLoadBtn: 'Load data',
-    dataDelayNote: 'Price and ATR may be delayed up to 20 minutes. Intended for strategy analysis, not real-time execution.',
+    dataDelayNote: 'Stock/ETF data may be delayed up to 20 min. Crypto is near real-time. Intended for strategy analysis, not order execution.',
     customLabel: 'Custom',
     customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
@@ -625,7 +625,7 @@ const T = {
       tip_mcRuin:    'A simulation path is counted as "ruin" if the portfolio drawdown ever hits this threshold. Set based on your personal pain tolerance.',
     },
     stips: {
-      stip_presets:   'Select a ticker and click Load to fetch current price and ATR%. Stocks and ETFs come from a Google Sheet powered by GOOGLEFINANCE. Crypto (BTC, ETH, SOL) is fetched from Kraken. Prices and ATR may be delayed up to 20 minutes — this is for strategy analysis, not precise order execution.',
+      stip_presets:   'Select a ticker and click Load to fetch current price and ATR%. Stocks and ETFs come from a Google Sheet powered by GOOGLEFINANCE (up to 20 min delay). Crypto (BTC, ETH, SOL) is fetched from Kraken (near real-time).',
       stip_portfolio: 'Your total trading capital. This is the base for all dollar calculations. Enter your actual account balance.',
       stip_params:    'The core assumptions of your strategy. Win rate and R:R represent your edge — derive these from backtests or live records. ATR and stop multiple determine position sizing. Fee and slippage represent your cost of trading.',
       stip_sizing:    'Derives position size from ATR-based stop distance and your max loss %. Core formula: position size = max loss % ÷ stop distance %. This ensures that if stopped out, your loss is exactly your max loss % — no more, no less.',
@@ -884,7 +884,7 @@ update();
 
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0f_UXb1oD5UHk90h_KJhKg9kin1bLcNgIU5LMFTEjUn011iTWZZTeImkmcLP4eeK4fH8PC4iz0HU/pub?gid=427890857&single=true&output=csv';
 const SHEET_CACHE_KEY = 'trading_analyzer_sheet';
-const SHEET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const SHEET_CACHE_TTL = 5 * 1000; // 5 seconds
 
 const CRYPTO_TICKERS = {
   BTC: {
