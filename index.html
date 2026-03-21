@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CB7LJSTCV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-5CB7LJSTCV');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trading Strategy Analyzer</title>
@@ -175,6 +184,8 @@
     <div class="ev-row" id="row-live-price" style="display:none;"><span class="ev-label" data-i18n="livePriceLabel"></span><span id="live-price-display"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="stopDistLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDist"></span></span></span><span id="stop-dist"></span></div>
     <div class="ev-row" id="row-stop-dollar" style="display:none;"><span class="ev-label"><span data-i18n="stopDollarLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopDollar"></span></span></span><span id="stop-dollar"></span></div>
+    <div class="ev-row" id="row-stop-price" style="display:none;"><span class="ev-label"><span data-i18n="stopPriceLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_stopPrice"></span></span></span><span id="stop-price" style="font-weight:500;"></span></div>
+    <div class="ev-row" id="row-target-price" style="display:none;"><span class="ev-label"><span data-i18n="targetPriceLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_targetPrice"></span></span></span><span id="target-price" style="font-weight:500;"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="posSizeLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_posSize"></span></span></span><span id="pos-size"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="kellyOptLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_kellyOpt"></span></span></span><span id="kelly-opt"></span></div>
     <div class="ev-row"><span class="ev-label"><span data-i18n="kellyFracLabel"></span><span class="tip">i<span class="tip-box" data-i18n-tip="tip_kellyFrac"></span></span></span><span id="kelly-frac" style="font-weight:500;"></span></div>
@@ -412,6 +423,8 @@ const T = {
     customPriceLabel: '현재 가격 입력:',
     livePriceLabel: '현재 가격',
     stopDollarLabel: '손절 거리 (가격 기준)',
+    stopPriceLabel: '손절 가격',
+    targetPriceLabel: '목표 가격',
     fetchingLabel: '데이터 로딩 중...',
     fetchErrorLabel: '데이터를 불러오지 못했습니다. 인터넷 연결을 확인하세요.',
     liveDataNote: (sym, price, source) => `${sym} — 현재가 ${price} (${source})`,
@@ -473,6 +486,8 @@ const T = {
       tip_slip:      '빠르게 움직이는 시장에서 손절 주문이 지정가보다 불리한 가격에 체결되는 현상. 포지션 크기 대비 %로 입력.',
       tip_stopDist:  '진입가 대비 손절 위치의 거리 (ATR% × 손절 배수).',
       tip_stopDollar:'현재 가격 기준 손절까지의 절대 금액 또는 포인트 거리.',
+      tip_stopPrice: '현재 가격에서 손절 거리를 뺀 가격. 이 가격 이하로 떨어지면 손절.',
+      tip_targetPrice:'현재 가격에서 (손절 거리 × 손익비)를 더한 가격. 이 가격에서 이익 실현.',
       tip_posSize:   '손절 시 손실이 설정한 최대 손실%와 정확히 일치하도록 계산한 포지션 크기. = 최대 손실% ÷ 손절 거리%.',
       tip_noiseRisk: '일상적인 가격 변동이 손절을 건드릴 가능성에 대한 대략적 위험도.',
       tip_totalFee:  '수수료율 × 2 (매수 + 매도). 분할 매수/매도를 해도 총 포지션 크기가 같다면 비용은 동일.',
@@ -551,6 +566,8 @@ const T = {
     customPriceLabel: 'Enter price:',
     livePriceLabel: 'Current price',
     stopDollarLabel: 'Stop distance (price terms)',
+    stopPriceLabel: 'Stop price',
+    targetPriceLabel: 'Target price',
     fetchingLabel: 'Fetching data...',
     fetchErrorLabel: 'Could not fetch data. Check your connection or try again later.',
     liveDataNote: (sym, price, source) => `${sym} — ${price} (${source})`,
@@ -613,6 +630,8 @@ const T = {
       tip_slip:      'When a stop is hit in a fast-moving market you get a worse fill than your stop price. Enter as % of position size.',
       tip_stopDist:  'Distance from entry to stop loss as a % of entry price (ATR% × stop multiple).',
       tip_stopDollar:'The absolute price distance to your stop based on the current live price.',
+      tip_stopPrice: 'Entry price minus stop distance. Exit the trade if price falls to this level.',
+      tip_targetPrice:'Entry price plus (stop distance × R:R). Take profit at this level.',
       tip_posSize:   'Position size that keeps your loss exactly at max loss % if stopped out. = max loss % ÷ stop distance %.',
       tip_noiseRisk: 'Qualitative indicator of how likely normal daily volatility is to trigger your stop before the trade plays out.',
       tip_totalFee:  'Fee rate × 2 (entry + exit). Identical regardless of how many tranches you scale in or out with.',
@@ -1241,15 +1260,27 @@ update = function() {
   const stopDist = atrPct * stopMult;
   if (livePrice && stopDist > 0) {
     const stopDollar = livePrice * stopDist / 100;
+    const rr = parseInt(document.getElementById('rr').value) / 10;
+    const stopPx = livePrice - stopDollar;
+    const targetPx = livePrice + stopDollar * rr;
+    const fmtPx = (v) => '$' + (v >= 1 ? v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : v.toFixed(4));
     const priceDisplay = '$' + (livePrice >= 1 ? Math.round(livePrice).toLocaleString() : livePrice.toFixed(2));
     const stopDisplay = '$' + stopDollar.toLocaleString(undefined, { maximumFractionDigits: 2 });
     document.getElementById('live-price-display').textContent = priceDisplay;
     document.getElementById('stop-dollar').textContent = stopDisplay;
+    document.getElementById('stop-price').textContent = fmtPx(stopPx);
+    document.getElementById('stop-price').style.color = '#E24B4A';
+    document.getElementById('target-price').textContent = fmtPx(targetPx);
+    document.getElementById('target-price').style.color = '#1D9E75';
     document.getElementById('row-live-price').style.display  = '';
     document.getElementById('row-stop-dollar').style.display = '';
+    document.getElementById('row-stop-price').style.display  = '';
+    document.getElementById('row-target-price').style.display = '';
   } else {
     document.getElementById('row-live-price').style.display  = 'none';
     document.getElementById('row-stop-dollar').style.display = 'none';
+    document.getElementById('row-stop-price').style.display  = 'none';
+    document.getElementById('row-target-price').style.display = 'none';
   }
 
   // ATR percentile display
